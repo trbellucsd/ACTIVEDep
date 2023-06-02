@@ -1,0 +1,976 @@
+{smcl}
+{com}{sf}{ul off}{txt}{.-}
+      name:  {res}<unnamed>
+       {txt}log:  {res}C:\Users\Joshua\Documents\Emily_Temp_Documents\ACTIVE\01. Depression_Trajectory_Manuscript\Output - Log Files\MI_Results_030820.smcl
+  {txt}log type:  {res}smcl
+ {txt}opened on:  {res} 8 Mar 2020, 22:34:50
+{txt}
+{com}. version 15 
+{txt}
+{com}. //using Stata 15
+. clear all 
+{res}{txt}
+{com}. //clear all data from memory
+. macro drop _all 
+{txt}
+{com}. //clear all macros in memory
+. set more off   
+{txt}
+{com}. //give output all at once (not one screenful at a time)
+. set linesize 120 
+{txt}
+{com}. //set output width 
+. use "C:\Users\Joshua\Documents\Emily_Temp_Documents\ACTIVE\01. Depression_Trajectory_Manuscript\Datasets\depression_long_mmse_cent+renamed+missing.dta", clear
+{txt}
+{com}. 
+. drop depression dep_9_bin missing time baseage basemmse yrseduc
+{txt}
+{com}. mdesc eemem reascb spdcb memcb dtotp cesdtot
+
+{txt}    Variable{col 17}{c |}     Missing          Total     Percent Missing
+{hline 16}{c +}{hline 47}
+          eemem{col 17}{c |} {res}      5,676         19,614          28.94
+         {txt}reascb{col 17}{c |} {res}      5,688         19,614          29.00
+          {txt}spdcb{col 17}{c |} {res}      5,975         19,614          30.46
+          {txt}memcb{col 17}{c |} {res}      5,676         19,614          28.94
+          {txt}dtotp{col 17}{c |} {res}      7,186         19,614          36.64
+        {txt}cesdtot{col 17}{c |} {res}      5,849         19,614          29.82
+{txt}{hline 16}{c +}{hline 47}
+
+{com}. 
+. mi set mlong
+{txt}
+{com}. mi register imputed eemem reascb spdcb memcb dtotp cesdtot c_yrseduc
+{res}{txt}{p}
+(8851 {it:m}=0 obs. now marked as incomplete)
+{p_end}
+
+{com}. mi register regular id visit site intgrp female Race c_basemmse c_baseage
+{txt}
+{com}. mi misstable summarize, all
+{txt}{col 64}Obs<.
+{col 49}{c TLC}{hline 30}
+{col 16}{c |}{col 49}{c |} Unique
+{col 7}Variable {c |}{col 22}Obs=.{col 32}Obs>.{col 42}Obs<.{col 49}{c |} values{col 65}Min{col 77}Max
+  {hline 13}{c +}{hline 32}{c +}{hline 30}
+            id {c |} (string variable){col 49}{c |}
+         visit {c |}{space 10}{space 10}{res}    19,614{txt}  {c |}      7          0         520
+         eemem {c |}{res}     5,676{txt}{space 10}{res}    13,938{txt}  {c |}   >500  -7.802736    6.219384
+        reascb {c |}{res}     5,688{txt}{space 10}{res}    13,926{txt}  {c |}   >500  -7.659929    11.27199
+         spdcb {c |}{res}     5,975{txt}{space 10}{res}    13,639{txt}  {c |}   >500  -12.46868    4.045787
+         memcb {c |}{res}     5,676{txt}{space 10}{res}    13,938{txt}  {c |}   >500    -9.8721    10.03177
+         dtotp {c |}{res}     7,186{txt}{space 10}{res}    12,428{txt}  {c |}     37          0          36
+       cesdtot {c |}{res}     5,849{txt}{space 10}{res}    13,765{txt}  {c |}     36          0          36
+     c_yrseduc {c |}{res}     4,508{txt}{space 10}{res}    15,106{txt}  {c |}     15  -9.602013    6.397987
+    c_basemmse {c |}{space 10}{space 10}{res}    19,614{txt}  {c |}      8  -4.312277    2.687723
+     c_baseage {c |}{space 10}{space 10}{res}    19,614{txt}  {c |}     29  -8.632762    20.36724
+          site {c |}{space 10}{space 10}{res}    19,614{txt}  {c |}      6          1           6
+        intgrp {c |}{space 10}{space 10}{res}    19,614{txt}  {c |}      4          1           4
+        female {c |}{space 10}{space 10}{res}    19,614{txt}  {c |}      2          0           1
+          Race {c |}{space 10}{space 10}{res}    19,614{txt}  {c |}      3          0           2
+  {hline 13}{c BT}{hline 32}{c BT}{hline 30}
+
+{com}. mi impute chained (regress) eemem reascb spdcb memcb c_yrseduc cesdtot dtotp = intgrp female Race c_basemmse c_baseage, add(60) rseed (3981) force
+{res}
+{txt}Conditional models:
+{p 9 21 2}
+{bf:c_yrseduc}: regress c_yrseduc eemem memcb reascb cesdtot spdcb dtotp intgrp female Race c_basemmse c_baseage
+{p_end}
+{p 13 21 2}
+{bf:eemem}: regress eemem c_yrseduc memcb reascb cesdtot spdcb dtotp intgrp female Race c_basemmse c_baseage
+{p_end}
+{p 13 21 2}
+{bf:memcb}: regress memcb c_yrseduc eemem reascb cesdtot spdcb dtotp intgrp female Race c_basemmse c_baseage
+{p_end}
+{p 12 21 2}
+{bf:reascb}: regress reascb c_yrseduc eemem memcb cesdtot spdcb dtotp intgrp female Race c_basemmse c_baseage
+{p_end}
+{p 11 21 2}
+{bf:cesdtot}: regress cesdtot c_yrseduc eemem memcb reascb spdcb dtotp intgrp female Race c_basemmse c_baseage
+{p_end}
+{p 13 21 2}
+{bf:spdcb}: regress spdcb c_yrseduc eemem memcb reascb cesdtot dtotp intgrp female Race c_basemmse c_baseage
+{p_end}
+{p 13 21 2}
+{bf:dtotp}: regress dtotp c_yrseduc eemem memcb reascb cesdtot spdcb intgrp female Race c_basemmse c_baseage
+{p_end}
+
+{res}{txt}Performing chained iterations ...
+{res}{txt}
+Multivariate imputation{txt}{col 45}{ralign 12:Imputations }= {res}      60
+{txt}Chained equations{txt}{col 45}{ralign 12:added }= {res}      60
+{txt}Imputed: {it:m}=1 through {it:m}=60{txt}{col 45}{ralign 12:updated }= {res}       0
+
+{txt}Initialization: {res}monotone{txt}{col 45}{ralign 12:Iterations }= {res}     600
+{txt}{col 45}{ralign 12:burn-in }= {res}      10
+
+{txt}{p 13 15 2}{bf:eemem}: linear regression{p_end}
+{txt}{p 12 15 2}{bf:reascb}: linear regression{p_end}
+{txt}{p 13 15 2}{bf:spdcb}: linear regression{p_end}
+{txt}{p 13 15 2}{bf:memcb}: linear regression{p_end}
+{txt}{p 9 15 2}{bf:c_yrseduc}: linear regression{p_end}
+{txt}{p 11 15 2}{bf:cesdtot}: linear regression{p_end}
+{txt}{p 13 15 2}{bf:dtotp}: linear regression{p_end}
+
+{txt}{hline 19}{c TT}{hline 35}{hline 11}
+{txt}{col 20}{c |}{center 46:  Observations per {it:m}}
+{txt}{col 20}{c LT}{hline 35}{c TT}{hline 10}
+{txt}{col 11}Variable {c |}{ralign 12:Complete }{ralign 13:Incomplete }{ralign 10:Imputed }{c |}{ralign 10:Total}
+{hline 19}{c +}{hline 35}{c +}{hline 10}
+{txt}{ralign 19:eemem }{c |}{res}      13938         5676      5676 {txt}{c |}{res}     19614
+{txt}{ralign 19:reascb }{c |}{res}      13926         5688      5688 {txt}{c |}{res}     19614
+{txt}{ralign 19:spdcb }{c |}{res}      13639         5975      5975 {txt}{c |}{res}     19614
+{txt}{ralign 19:memcb }{c |}{res}      13938         5676      5676 {txt}{c |}{res}     19614
+{txt}{ralign 19:c_yrseduc }{c |}{res}      15106         4508      4508 {txt}{c |}{res}     19614
+{txt}{ralign 19:cesdtot }{c |}{res}      13765         5849      5849 {txt}{c |}{res}     19614
+{txt}{ralign 19:dtotp }{c |}{res}      12428         7186      7186 {txt}{c |}{res}     19614
+{txt}{hline 19}{c BT}{hline 35}{c BT}{hline 10}
+{p 0 1 1 66}(complete + incomplete = total; imputed is the minimum across {it:m}
+ of the number of filled-in observations.){p_end}
+
+{com}. 
+. mi describe 
+
+{txt}{p 2 10 1}
+Style:
+{res:mlong}{break}
+{break}last {bf:mi update} 08mar2020 22:34:53,
+approximately 2 minutes ago
+
+  Obs.:   complete  {res}     10,763
+{txt}{col 11}incomplete{res}      8,851{txt}  ({it:M} = {res:60} imputations)
+{col 11}{hline 21}
+{col 11}total     {res}     19,614
+
+{txt}{p 2 20 1}
+Vars.:  imputed:  7;
+eemem({res:5676})
+reascb({res:5688})
+spdcb({res:5975})
+memcb({res:5676})
+dtotp({res:7186})
+cesdtot({res:5849})
+c_yrseduc({res:4508})
+{p_end}
+
+{p 10 20 1}
+passive:  0
+{p_end}
+
+{p 10 20 1}
+regular:  8;
+id visit site intgrp female Race c_basemmse c_baseage
+{p_end}
+
+{p 10 20 1}
+system:{bind:   }3;
+_mi_m _mi_id _mi_miss
+{p_end}
+
+{p 9 4 1}
+(there are no unregistered variables)
+{p_end}
+
+{com}. gen depression=.
+{txt}(550,674 missing values generated)
+
+{com}. replace depression=0 if cesdtot<9 &cesdtot!=.
+{txt}(395,473 real changes made)
+
+{com}. replace depression=1 if cesdtot>=9 &cesdtot!=.
+{txt}(149,352 real changes made)
+
+{com}. 
+. gen eemem1=eemem 
+{txt}(5,676 missing values generated)
+
+{com}. //replicate memory score into new variable
+. sum eemem if visit==0
+
+{txt}    Variable {c |}        Obs        Mean    Std. Dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 7}eemem {c |}{res}      7,601   -.8285661    2.538721     -7.681      6.219
+{txt}
+{com}. replace eemem1 = eemem1-r(mean) 
+{txt}(544,998 real changes made)
+
+{com}. //subtract mean to center each var at zero
+. replace eemem1 = eemem1/r(sd)
+{txt}(544,998 real changes made)
+
+{com}. //divide by SD to standardize SD (1)
+. sum eemem1 
+
+{txt}    Variable {c |}        Obs        Mean    Std. Dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 6}eemem1 {c |}{res}    544,998    .1437715    .9813575  -4.678409   4.169458
+{txt}
+{com}. //check to make sure standardization worked
+. gen reascb1=reascb 
+{txt}(5,688 missing values generated)
+
+{com}. //repeat for each variable
+. sum reascb if visit==0
+
+{txt}    Variable {c |}        Obs        Mean    Std. Dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 6}reascb {c |}{res}      7,602    -.742344    2.832301  -7.659929   10.53776
+{txt}
+{com}. replace reascb1 = reascb1-r(mean)
+{txt}(544,986 real changes made)
+
+{com}. replace reascb1 = reascb1/r(sd)
+{txt}(544,986 real changes made)
+
+{com}. sum reascb1
+
+{txt}    Variable {c |}        Obs        Mean    Std. Dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 5}reascb1 {c |}{res}    544,986     .409748    1.008227  -4.388275   4.738617
+{txt}
+{com}. gen spdcb1=spdcb
+{txt}(5,975 missing values generated)
+
+{com}. sum spdcb if visit==0
+
+{txt}    Variable {c |}        Obs        Mean    Std. Dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 7}spdcb {c |}{res}      7,577     .602512    2.575618  -8.651456   10.10449
+{txt}
+{com}. replace spdcb1 = spdcb1-r(mean)
+{txt}(544,699 real changes made)
+
+{com}. replace spdcb1 = spdcb1/r(sd)
+{txt}(544,699 real changes made)
+
+{com}. sum spdcb1
+
+{txt}    Variable {c |}        Obs        Mean    Std. Dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 6}spdcb1 {c |}{res}    544,699    -.575056      1.2331  -6.361358   5.262341
+{txt}
+{com}. gen dtotp1=dtotp
+{txt}(7,186 missing values generated)
+
+{com}. sum dtotp if visit==0
+
+{txt}    Variable {c |}        Obs        Mean    Std. Dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 7}dtotp {c |}{res}      7,602     2.14312    2.829922          0         20
+{txt}
+{com}. replace dtotp1=dtotp1-r(mean)
+{txt}(543,488 real changes made)
+
+{com}. replace dtotp1=dtotp1/r(sd)
+{txt}(543,488 real changes made)
+
+{com}. sum dtotp1
+
+{txt}    Variable {c |}        Obs        Mean    Std. Dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 6}dtotp1 {c |}{res}    543,488    .0956601    1.758685   -6.20059   11.96389
+{txt}
+{com}. 
+. gen intgrp1=.
+{txt}(550,674 missing values generated)
+
+{com}. replace intgrp1=1 if intgrp==4
+{txt}(139,706 real changes made)
+
+{com}. replace intgrp1=2 if intgrp==1
+{txt}(138,001 real changes made)
+
+{com}. replace intgrp1=3 if intgrp==2
+{txt}(137,313 real changes made)
+
+{com}. replace intgrp1=4 if intgrp==3
+{txt}(135,654 real changes made)
+
+{com}. drop intgrp
+{txt}
+{com}. rename intgrp1 intgrp
+{res}{txt}
+{com}. 
+. disp "MEMORY SCORE DIFFERENCE DEPRESSION VS NON-DEPRESSION FOR TRAINING GROUP"
+{res}MEMORY SCORE DIFFERENCE DEPRESSION VS NON-DEPRESSION FOR TRAINING GROUP
+{txt}
+{com}. mi estimate , esampvaryok: mixed eemem1 i.visit depression c_baseage c_yrseduc c_basemmse female i.Race i.visit#depression || id: if intgrp==2
+{res}
+{txt}Multiple-imputation estimates{col 49}Imputations{col 67}= {res}        60
+{txt}Mixed-effects ML regression{col 49}Number of obs{col 67}= {res}     4,921
+
+{txt}Group variable: {res:id}{col 49}Number of groups{col 67}= {res}       703
+{txt}{col 49}Obs per group:
+{col 49}              min{col 67}= {res}         7
+{txt}{col 49}              avg{col 67}= {res}       7.0
+{txt}{col 49}              max{col 67}= {res}         7
+{txt}{col 49}Average RVI{col 67}= {res}    0.4015
+{txt}{col 49}Largest FMI{col 67}= {res}    0.5590
+{txt}DF adjustment:{ralign 15: {res:Large sample}}{col 49}DF:     min{col 67}= {res}    191.90
+{txt}{col 49}        avg{col 67}= {res}  3,348.63
+{txt}{col 49}        max{col 67}= {res} 18,955.14
+{txt}Model F test:{ralign 16: {res:Equal FMI}}{col 49}F({res}  19{txt},{res}13082.4{txt}){col 67}= {res}     43.74
+{txt}{col 49}Prob > F{col 67}= {res}    0.0000
+
+{txt}{hline 17}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}          eemem1{col 18}{c |}      Coef.{col 30}   Std. Err.{col 42}      t{col 50}   P>|t|{col 58}     [95% Con{col 71}f. Interval]
+{hline 17}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 11}visit {c |}
+{space 14}6  {c |}{col 18}{res}{space 2} .2120324{col 30}{space 2} .0398506{col 41}{space 1}    5.32{col 50}{space 3}0.000{col 58}{space 4} .1339217{col 71}{space 3} .2901432
+{txt}{space 13}52  {c |}{col 18}{res}{space 2} .1009529{col 30}{space 2} .0431253{col 41}{space 1}    2.34{col 50}{space 3}0.019{col 58}{space 4} .0163787{col 71}{space 3} .1855271
+{txt}{space 12}104  {c |}{col 18}{res}{space 2} .0812012{col 30}{space 2} .0434631{col 41}{space 1}    1.87{col 50}{space 3}0.062{col 58}{space 4}-.0040437{col 71}{space 3}  .166446
+{txt}{space 12}156  {c |}{col 18}{res}{space 2} .0597084{col 30}{space 2} .0438247{col 41}{space 1}    1.36{col 50}{space 3}0.173{col 58}{space 4}-.0262495{col 71}{space 3} .1456664
+{txt}{space 12}260  {c |}{col 18}{res}{space 2}-.0889515{col 30}{space 2} .0459556{col 41}{space 1}   -1.94{col 50}{space 3}0.053{col 58}{space 4}-.1791439{col 71}{space 3}  .001241
+{txt}{space 12}520  {c |}{col 18}{res}{space 2}-.2298831{col 30}{space 2} .0512964{col 41}{space 1}   -4.48{col 50}{space 3}0.000{col 58}{space 4}-.3307341{col 71}{space 3} -.129032
+{txt}{space 16} {c |}
+{space 6}depression {c |}{col 18}{res}{space 2} -.059138{col 30}{space 2} .0861018{col 41}{space 1}   -0.69{col 50}{space 3}0.493{col 58}{space 4}-.2289654{col 71}{space 3} .1106895
+{txt}{space 7}c_baseage {c |}{col 18}{res}{space 2}-.0457844{col 30}{space 2} .0035668{col 41}{space 1}  -12.84{col 50}{space 3}0.000{col 58}{space 4}-.0527769{col 71}{space 3}-.0387918
+{txt}{space 7}c_yrseduc {c |}{col 18}{res}{space 2} .0672963{col 30}{space 2} .0074822{col 41}{space 1}    8.99{col 50}{space 3}0.000{col 58}{space 4} .0525621{col 71}{space 3} .0820305
+{txt}{space 6}c_basemmse {c |}{col 18}{res}{space 2} .1550702{col 30}{space 2} .0112346{col 41}{space 1}   13.80{col 50}{space 3}0.000{col 58}{space 4}  .133039{col 71}{space 3} .1771013
+{txt}{space 10}female {c |}{col 18}{res}{space 2} .3785989{col 30}{space 2} .0504622{col 41}{space 1}    7.50{col 50}{space 3}0.000{col 58}{space 4} .2796565{col 71}{space 3} .4775413
+{txt}{space 16} {c |}
+{space 12}Race {c |}
+{space 10}Black  {c |}{col 18}{res}{space 2}-.4023836{col 30}{space 2} .0511587{col 41}{space 1}   -7.87{col 50}{space 3}0.000{col 58}{space 4}-.5026816{col 71}{space 3}-.3020855
+{txt}{space 10}Other  {c |}{col 18}{res}{space 2}-.2549441{col 30}{space 2} .2049118{col 41}{space 1}   -1.24{col 50}{space 3}0.213{col 58}{space 4}-.6565934{col 71}{space 3} .1467051
+{txt}{space 16} {c |}
+visit#depression {c |}
+{space 10}  0 1  {c |}{col 18}{res}{space 2} .0020141{col 30}{space 2} .1054397{col 41}{space 1}    0.02{col 50}{space 3}0.985{col 58}{space 4}-.2051837{col 71}{space 3}  .209212
+{txt}{space 10}  6 1  {c |}{col 18}{res}{space 2}-.1055012{col 30}{space 2} .1079348{col 41}{space 1}   -0.98{col 50}{space 3}0.329{col 58}{space 4}-.3176979{col 71}{space 3} .1066955
+{txt}{space 10} 52 1  {c |}{col 18}{res}{space 2}-.0270444{col 30}{space 2} .1110828{col 41}{space 1}   -0.24{col 50}{space 3}0.808{col 58}{space 4}-.2456289{col 71}{space 3}   .19154
+{txt}{space 10}104 1  {c |}{col 18}{res}{space 2}-.0690346{col 30}{space 2} .1087855{col 41}{space 1}   -0.63{col 50}{space 3}0.526{col 58}{space 4}-.2830006{col 71}{space 3} .1449315
+{txt}{space 10}156 1  {c |}{col 18}{res}{space 2}-.1058091{col 30}{space 2} .1120599{col 41}{space 1}   -0.94{col 50}{space 3}0.346{col 58}{space 4}-.3263872{col 71}{space 3}  .114769
+{txt}{space 10}260 1  {c |}{col 18}{res}{space 2}-.0705017{col 30}{space 2} .1077791{col 41}{space 1}   -0.65{col 50}{space 3}0.513{col 58}{space 4}-.2825345{col 71}{space 3} .1415311
+{txt}{space 10}520 1  {c |}{col 18}{res}{space 2}        0{col 30}{txt}  (omitted)
+{space 16} {c |}
+{space 11}_cons {c |}{col 18}{res}{space 2} .1672899{col 30}{space 2} .0518798{col 41}{space 1}    3.22{col 50}{space 3}0.001{col 58}{space 4} .0655909{col 71}{space 3} .2689889
+{txt}{hline 17}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+
+{hline 29}{c TT}{hline 48}
+{col 3}Random-effects Parameters{col 30}{c |}{col 34}Estimate{col 45}Std. Err.{col 59}[95% Conf. Interval]
+{hline 29}{c +}{hline 48}
+{res}id{txt}: Identity{col 30}{c |}
+{col 20}sd(_cons){col 30}{c |}{res}{col 33} .4593965{col 44} .0165446{col 58} .4280821{col 70} .4930016
+{txt}{hline 29}{c +}{hline 48}
+{col 17}sd(Residual){col 30}{c |}{res}{col 33} .6416264{col 44} .0093473{col 58} .6234938{col 70} .6602864
+{txt}{hline 29}{c BT}{hline 48}
+{res}{txt}
+{com}. disp "MEMORY SCORE DIFFERENCE DEPRESSION VS NON-DEPRESSION FOR CONTROL GROUP"
+{res}MEMORY SCORE DIFFERENCE DEPRESSION VS NON-DEPRESSION FOR CONTROL GROUP
+{txt}
+{com}. mi estimate, esampvaryok: mixed eemem1 i.visit depression c_baseage c_yrseduc c_basemmse female i.Race i.visit#depression || id: if intgrp==1
+{res}
+{txt}Multiple-imputation estimates{col 49}Imputations{col 67}= {res}        60
+{txt}Mixed-effects ML regression{col 49}Number of obs{col 67}= {res}     4,886
+
+{txt}Group variable: {res:id}{col 49}Number of groups{col 67}= {res}       698
+{txt}{col 49}Obs per group:
+{col 49}              min{col 67}= {res}         7
+{txt}{col 49}              avg{col 67}= {res}       7.0
+{txt}{col 49}              max{col 67}= {res}         7
+{txt}{col 49}Average RVI{col 67}= {res}    0.4735
+{txt}{col 49}Largest FMI{col 67}= {res}    0.6268
+{txt}DF adjustment:{ralign 15: {res:Large sample}}{col 49}DF:     min{col 67}= {res}    152.51
+{txt}{col 49}        avg{col 67}= {res}  1,896.76
+{txt}{col 49}        max{col 67}= {res}  9,484.80
+{txt}Model F test:{ralign 16: {res:Equal FMI}}{col 49}F({res}  19{txt},{res}10053.8{txt}){col 67}= {res}     53.35
+{txt}{col 49}Prob > F{col 67}= {res}    0.0000
+
+{txt}{hline 17}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}          eemem1{col 18}{c |}      Coef.{col 30}   Std. Err.{col 42}      t{col 50}   P>|t|{col 58}     [95% Con{col 71}f. Interval]
+{hline 17}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 11}visit {c |}
+{space 14}6  {c |}{col 18}{res}{space 2}-.0160866{col 30}{space 2} .0396494{col 41}{space 1}   -0.41{col 50}{space 3}0.685{col 58}{space 4} -.093808{col 71}{space 3} .0616347
+{txt}{space 13}52  {c |}{col 18}{res}{space 2}-.0706309{col 30}{space 2} .0427963{col 41}{space 1}   -1.65{col 50}{space 3}0.099{col 58}{space 4}-.1545721{col 71}{space 3} .0133102
+{txt}{space 12}104  {c |}{col 18}{res}{space 2}-.0948388{col 30}{space 2} .0447963{col 41}{space 1}   -2.12{col 50}{space 3}0.035{col 58}{space 4}-.1827626{col 71}{space 3}-.0069149
+{txt}{space 12}156  {c |}{col 18}{res}{space 2}-.1542303{col 30}{space 2} .0434639{col 41}{space 1}   -3.55{col 50}{space 3}0.000{col 58}{space 4}-.2395014{col 71}{space 3}-.0689592
+{txt}{space 12}260  {c |}{col 18}{res}{space 2} -.293079{col 30}{space 2} .0469249{col 41}{space 1}   -6.25{col 50}{space 3}0.000{col 58}{space 4}-.3852376{col 71}{space 3}-.2009204
+{txt}{space 12}520  {c |}{col 18}{res}{space 2}-.3531188{col 30}{space 2} .0528142{col 41}{space 1}   -6.69{col 50}{space 3}0.000{col 58}{space 4}  -.45706{col 71}{space 3}-.2491776
+{txt}{space 16} {c |}
+{space 6}depression {c |}{col 18}{res}{space 2}-.0893612{col 30}{space 2}  .090408{col 41}{space 1}   -0.99{col 50}{space 3}0.325{col 58}{space 4}-.2679749{col 71}{space 3} .0892526
+{txt}{space 7}c_baseage {c |}{col 18}{res}{space 2}-.0496246{col 30}{space 2}    .0033{col 41}{space 1}  -15.04{col 50}{space 3}0.000{col 58}{space 4}-.0560957{col 71}{space 3}-.0431534
+{txt}{space 7}c_yrseduc {c |}{col 18}{res}{space 2} .0720039{col 30}{space 2} .0072199{col 41}{space 1}    9.97{col 50}{space 3}0.000{col 58}{space 4} .0577804{col 71}{space 3} .0862274
+{txt}{space 6}c_basemmse {c |}{col 18}{res}{space 2} .1555339{col 30}{space 2} .0105183{col 41}{space 1}   14.79{col 50}{space 3}0.000{col 58}{space 4} .1349041{col 71}{space 3} .1761636
+{txt}{space 10}female {c |}{col 18}{res}{space 2} .4405389{col 30}{space 2} .0458857{col 41}{space 1}    9.60{col 50}{space 3}0.000{col 58}{space 4}  .350542{col 71}{space 3} .5305359
+{txt}{space 16} {c |}
+{space 12}Race {c |}
+{space 10}Black  {c |}{col 18}{res}{space 2}-.3914966{col 30}{space 2} .0442821{col 41}{space 1}   -8.84{col 50}{space 3}0.000{col 58}{space 4}-.4783092{col 71}{space 3}-.3046841
+{txt}{space 10}Other  {c |}{col 18}{res}{space 2}-.4414934{col 30}{space 2} .1346471{col 41}{space 1}   -3.28{col 50}{space 3}0.001{col 58}{space 4}-.7055186{col 71}{space 3}-.1774682
+{txt}{space 16} {c |}
+visit#depression {c |}
+{space 10}  0 1  {c |}{col 18}{res}{space 2}-.0701902{col 30}{space 2} .1097855{col 41}{space 1}   -0.64{col 50}{space 3}0.523{col 58}{space 4}-.2863028{col 71}{space 3} .1459223
+{txt}{space 10}  6 1  {c |}{col 18}{res}{space 2}-.0742991{col 30}{space 2} .1095254{col 41}{space 1}   -0.68{col 50}{space 3}0.498{col 58}{space 4}-.2898883{col 71}{space 3} .1412902
+{txt}{space 10} 52 1  {c |}{col 18}{res}{space 2}-.1206499{col 30}{space 2} .1076294{col 41}{space 1}   -1.12{col 50}{space 3}0.263{col 58}{space 4}-.3324536{col 71}{space 3} .0911537
+{txt}{space 10}104 1  {c |}{col 18}{res}{space 2}-.1256026{col 30}{space 2} .1090193{col 41}{space 1}   -1.15{col 50}{space 3}0.250{col 58}{space 4}-.3401829{col 71}{space 3} .0889777
+{txt}{space 10}156 1  {c |}{col 18}{res}{space 2} -.050639{col 30}{space 2} .1109885{col 41}{space 1}   -0.46{col 50}{space 3}0.649{col 58}{space 4}  -.26917{col 71}{space 3}  .167892
+{txt}{space 10}260 1  {c |}{col 18}{res}{space 2}-.0234332{col 30}{space 2} .1145645{col 41}{space 1}   -0.20{col 50}{space 3}0.838{col 58}{space 4} -.249243{col 71}{space 3} .2023767
+{txt}{space 10}520 1  {c |}{col 18}{res}{space 2}        0{col 30}{txt}  (omitted)
+{space 16} {c |}
+{space 11}_cons {c |}{col 18}{res}{space 2} .1378156{col 30}{space 2} .0465715{col 41}{space 1}    2.96{col 50}{space 3}0.003{col 58}{space 4} .0465205{col 71}{space 3} .2291108
+{txt}{hline 17}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+
+{hline 29}{c TT}{hline 48}
+{col 3}Random-effects Parameters{col 30}{c |}{col 34}Estimate{col 45}Std. Err.{col 59}[95% Conf. Interval]
+{hline 29}{c +}{hline 48}
+{res}id{txt}: Identity{col 30}{c |}
+{col 20}sd(_cons){col 30}{c |}{res}{col 33} .4079047{col 44} .0155248{col 58} .3785771{col 70} .4395042
+{txt}{hline 29}{c +}{hline 48}
+{col 17}sd(Residual){col 30}{c |}{res}{col 33} .6223716{col 44} .0085849{col 58} .6057244{col 70} .6394763
+{txt}{hline 29}{c BT}{hline 48}
+{res}{txt}
+{com}. disp "MEMORY SCORE DIFFERENCE DEPRESSION VS NON-DEPRESSION FOR INTERVENTION VS TRAINING GROUP"
+{res}MEMORY SCORE DIFFERENCE DEPRESSION VS NON-DEPRESSION FOR INTERVENTION VS TRAINING GROUP
+{txt}
+{com}. mi estimate (condep: _b[depression] + _b[0.visit#1.depression#1.intgrp] + _b[6.visit#1.depression#1.intgrp] + _b[52.visit#1.depression#1.intgrp] + _b[104.visit#1.depression#1.intgrp] + _b[156.visit#1.depression#1.intgrp] + _b[260.visit#1.depression#1.intgrp] + _b[520.visit#1.depression#1.intgrp]) (intnodep: _b[intgrp] + _b[0.visit#0.depression#2.intgrp] + _b[6.visit#0.depression#2.intgrp] + _b[52.visit#0.depression#2.intgrp] + _b[104.visit#0.depression#2.intgrp] + _b[156.visit#0.depression#2.intgrp] + _b[260.visit#0.depression#2.intgrp] + _b[520.visit#0.depression#2.intgrp]) (intdep: _b[depression] + _b[intgrp] + _b[0.visit#1.depression#2.intgrp] + _b[6.visit#1.depression#2.intgrp] + _b[52.visit#1.depression#2.intgrp] + _b[104.visit#1.depression#2.intgrp] + _b[156.visit#1.depression#2.intgrp] + _b[260.visit#1.depression#2.intgrp] + _b[520.visit#1.depression#2.intgrp]), esampvaryok : mixed eemem1 i.visit intgrp depression c_baseage c_yrseduc c_basemmse female i.Race i.visit#intgrp#depression || id: if intgrp==2 | intgrp==1
+{res}
+{txt}Multiple-imputation estimates{col 49}Imputations{col 67}= {res}        60
+{txt}Mixed-effects ML regression{col 49}Number of obs{col 67}= {res}     9,807
+
+{txt}Group variable: {res:id}{col 49}Number of groups{col 67}= {res}     1,401
+{txt}{col 49}Obs per group:
+{col 49}              min{col 67}= {res}         7
+{txt}{col 49}              avg{col 67}= {res}       7.0
+{txt}{col 49}              max{col 67}= {res}         7
+{txt}{col 49}Average RVI{col 67}= {res}    0.4719
+{txt}{col 49}Largest FMI{col 67}= {res}    0.5679
+{txt}DF adjustment:{ralign 15: {res:Large sample}}{col 49}DF:     min{col 67}= {res}    185.95
+{txt}{col 49}        avg{col 67}= {res}  1,164.72
+{txt}{col 49}        max{col 67}= {res} 10,181.27
+{txt}Model F test:{ralign 16: {res:Equal FMI}}{col 49}F({res}  33{txt},{res}18254.5{txt}){col 67}= {res}     55.50
+{txt}{col 49}Prob > F{col 67}= {res}    0.0000
+
+{txt}{hline 24}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}                 eemem1{col 25}{c |}      Coef.{col 37}   Std. Err.{col 49}      t{col 57}   P>|t|{col 65}     [95% Con{col 78}f. Interval]
+{hline 24}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 18}visit {c |}
+{space 21}6  {c |}{col 25}{res}{space 2}-.0159601{col 37}{space 2} .0402124{col 48}{space 1}   -0.40{col 57}{space 3}0.691{col 65}{space 4}-.0947844{col 78}{space 3} .0628643
+{txt}{space 20}52  {c |}{col 25}{res}{space 2}-.0701854{col 37}{space 2} .0433656{col 48}{space 1}   -1.62{col 57}{space 3}0.106{col 65}{space 4}-.1552403{col 78}{space 3} .0148696
+{txt}{space 19}104  {c |}{col 25}{res}{space 2}-.0943843{col 37}{space 2} .0453241{col 48}{space 1}   -2.08{col 57}{space 3}0.038{col 65}{space 4}-.1833382{col 78}{space 3}-.0054305
+{txt}{space 19}156  {c |}{col 25}{res}{space 2}-.1534957{col 37}{space 2} .0440102{col 48}{space 1}   -3.49{col 57}{space 3}0.001{col 65}{space 4}-.2398344{col 78}{space 3}-.0671569
+{txt}{space 19}260  {c |}{col 25}{res}{space 2}-.2926165{col 37}{space 2}  .047453{col 48}{space 1}   -6.17{col 57}{space 3}0.000{col 65}{space 4}-.3858045{col 78}{space 3}-.1994284
+{txt}{space 19}520  {c |}{col 25}{res}{space 2}-.3523563{col 37}{space 2} .0532688{col 48}{space 1}   -6.61{col 57}{space 3}0.000{col 65}{space 4}-.4571767{col 78}{space 3}-.2475359
+{txt}{space 23} {c |}
+{space 17}intgrp {c |}{col 25}{res}{space 2} .1065122{col 37}{space 2} .0664876{col 48}{space 1}    1.60{col 57}{space 3}0.111{col 65}{space 4}-.0244873{col 78}{space 3} .2375118
+{txt}{space 13}depression {c |}{col 25}{res}{space 2}-.0588868{col 37}{space 2} .0852654{col 48}{space 1}   -0.69{col 57}{space 3}0.491{col 65}{space 4}-.2270884{col 78}{space 3} .1093148
+{txt}{space 14}c_baseage {c |}{col 25}{res}{space 2}-.0478503{col 37}{space 2} .0024399{col 48}{space 1}  -19.61{col 57}{space 3}0.000{col 65}{space 4}-.0526343{col 78}{space 3}-.0430663
+{txt}{space 14}c_yrseduc {c |}{col 25}{res}{space 2} .0696445{col 37}{space 2} .0054188{col 48}{space 1}   12.85{col 57}{space 3}0.000{col 65}{space 4} .0589624{col 78}{space 3} .0803266
+{txt}{space 13}c_basemmse {c |}{col 25}{res}{space 2} .1557128{col 37}{space 2} .0077144{col 48}{space 1}   20.18{col 57}{space 3}0.000{col 65}{space 4} .1405834{col 78}{space 3} .1708423
+{txt}{space 17}female {c |}{col 25}{res}{space 2} .4097738{col 37}{space 2} .0348537{col 48}{space 1}   11.76{col 57}{space 3}0.000{col 65}{space 4} .3414069{col 78}{space 3} .4781407
+{txt}{space 23} {c |}
+{space 19}Race {c |}
+{space 17}Black  {c |}{col 25}{res}{space 2}-.3972645{col 37}{space 2} .0335409{col 48}{space 1}  -11.84{col 57}{space 3}0.000{col 65}{space 4}-.4630182{col 78}{space 3}-.3315108
+{txt}{space 17}Other  {c |}{col 25}{res}{space 2}-.3870955{col 37}{space 2} .1147092{col 48}{space 1}   -3.37{col 57}{space 3}0.001{col 65}{space 4}-.6119944{col 78}{space 3}-.1621965
+{txt}{space 23} {c |}
+visit#intgrp#depression {c |}
+{space 15}  0 1 1  {c |}{col 25}{res}{space 2}-.0985468{col 37}{space 2} .1058923{col 48}{space 1}   -0.93{col 57}{space 3}0.353{col 65}{space 4}-.3067349{col 78}{space 3} .1096413
+{txt}{space 15}  0 2 0  {c |}{col 25}{res}{space 2}-.1225741{col 37}{space 2} .0728196{col 48}{space 1}   -1.68{col 57}{space 3}0.093{col 65}{space 4}-.2657818{col 78}{space 3} .0206336
+{txt}{space 15}  0 2 1  {c |}{col 25}{res}{space 2}-.1192484{col 37}{space 2} .1038541{col 48}{space 1}   -1.15{col 57}{space 3}0.252{col 65}{space 4}-.3234056{col 78}{space 3} .0849088
+{txt}{space 15}  6 1 1  {c |}{col 25}{res}{space 2}-.1027517{col 37}{space 2} .1101029{col 48}{space 1}   -0.93{col 57}{space 3}0.351{col 65}{space 4} -.319385{col 78}{space 3} .1138816
+{txt}{space 15}  6 2 0  {c |}{col 25}{res}{space 2} .1054567{col 37}{space 2} .0740451{col 48}{space 1}    1.42{col 57}{space 3}0.155{col 65}{space 4}-.0402097{col 78}{space 3} .2511231
+{txt}{space 15}  6 2 1  {c |}{col 25}{res}{space 2} .0011261{col 37}{space 2} .1063483{col 48}{space 1}    0.01{col 57}{space 3}0.992{col 65}{space 4}-.2080326{col 78}{space 3} .2102848
+{txt}{space 15} 52 1 1  {c |}{col 25}{res}{space 2}-.1501321{col 37}{space 2} .1120726{col 48}{space 1}   -1.34{col 57}{space 3}0.181{col 65}{space 4}-.3707564{col 78}{space 3} .0704921
+{txt}{space 15} 52 2 0  {c |}{col 25}{res}{space 2} .0484911{col 37}{space 2} .0792023{col 48}{space 1}    0.61{col 57}{space 3}0.541{col 65}{space 4}-.1075264{col 78}{space 3} .2045086
+{txt}{space 15} 52 2 1  {c |}{col 25}{res}{space 2} .0229118{col 37}{space 2} .1042994{col 48}{space 1}    0.22{col 57}{space 3}0.826{col 65}{space 4}-.1822039{col 78}{space 3} .2280274
+{txt}{space 15}104 1 1  {c |}{col 25}{res}{space 2}-.1551791{col 37}{space 2} .1094823{col 48}{space 1}   -1.42{col 57}{space 3}0.157{col 65}{space 4} -.370585{col 78}{space 3} .0602269
+{txt}{space 15}104 2 0  {c |}{col 25}{res}{space 2} .0529081{col 37}{space 2} .0751248{col 48}{space 1}    0.70{col 57}{space 3}0.482{col 65}{space 4}-.0949195{col 78}{space 3} .2007357
+{txt}{space 15}104 2 1  {c |}{col 25}{res}{space 2}-.0148613{col 37}{space 2} .1100452{col 48}{space 1}   -0.14{col 57}{space 3}0.893{col 65}{space 4}-.2315071{col 78}{space 3} .2017845
+{txt}{space 15}156 1 1  {c |}{col 25}{res}{space 2}-.0809843{col 37}{space 2} .1135969{col 48}{space 1}   -0.71{col 57}{space 3}0.477{col 65}{space 4}-.3046439{col 78}{space 3} .1426753
+{txt}{space 15}156 2 0  {c |}{col 25}{res}{space 2} .0906365{col 37}{space 2} .0778574{col 48}{space 1}    1.16{col 57}{space 3}0.245{col 65}{space 4}-.0626763{col 78}{space 3} .2439493
+{txt}{space 15}156 2 1  {c |}{col 25}{res}{space 2}-.0145075{col 37}{space 2} .1061633{col 48}{space 1}   -0.14{col 57}{space 3}0.891{col 65}{space 4}-.2234015{col 78}{space 3} .1943864
+{txt}{space 15}260 1 1  {c |}{col 25}{res}{space 2}-.0524386{col 37}{space 2} .1140575{col 48}{space 1}   -0.46{col 57}{space 3}0.646{col 65}{space 4}-.2771135{col 78}{space 3} .1722362
+{txt}{space 15}260 2 0  {c |}{col 25}{res}{space 2} .0812791{col 37}{space 2} .0829688{col 48}{space 1}    0.98{col 57}{space 3}0.328{col 65}{space 4}-.0822918{col 78}{space 3} .2448501
+{txt}{space 15}260 2 1  {c |}{col 25}{res}{space 2} .0109265{col 37}{space 2} .1036067{col 48}{space 1}    0.11{col 57}{space 3}0.916{col 65}{space 4}-.1928755{col 78}{space 3} .2147286
+{txt}{space 15}520 1 1  {c |}{col 25}{res}{space 2}-.0298881{col 37}{space 2} .1208626{col 48}{space 1}   -0.25{col 57}{space 3}0.805{col 65}{space 4}-.2683262{col 78}{space 3}   .20855
+{txt}{space 15}520 2 0  {c |}{col 25}{res}{space 2}        0{col 37}{txt}  (omitted)
+{space 15}520 2 1  {c |}{col 25}{res}{space 2}        0{col 37}{txt}  (omitted)
+{space 23} {c |}
+{space 18}_cons {c |}{col 25}{res}{space 2} .0525743{col 37}{space 2} .0825442{col 48}{space 1}    0.64{col 57}{space 3}0.525{col 65}{space 4}-.1096534{col 78}{space 3}  .214802
+{txt}{hline 24}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+
+{hline 29}{c TT}{hline 48}
+{col 3}Random-effects Parameters{col 30}{c |}{col 34}Estimate{col 45}Std. Err.{col 59}[95% Conf. Interval]
+{hline 29}{c +}{hline 48}
+{res}id{txt}: Identity{col 30}{c |}
+{col 20}sd(_cons){col 30}{c |}{res}{col 33} .4351649{col 44} .0114574{col 58} .4132723{col 70} .4582172
+{txt}{hline 29}{c +}{hline 48}
+{col 17}sd(Residual){col 30}{c |}{res}{col 33} .6321729{col 44} .0063466{col 58} .6198133{col 70}  .644779
+{txt}{hline 29}{c BT}{hline 48}
+
+Transformations{col 49}Average RVI{col 67}= {res}    0.9383
+{txt}{col 49}Largest FMI{col 67}= {res}    0.5338
+{txt}DF adjustment:{ralign 15: {res:Large sample}}{col 49}DF:     min{col 67}= {res}    210.55
+{txt}{col 49}        avg{col 67}= {res}    227.01
+{txt}{col 49}        max{col 67}= {res}    258.11
+
+       {txt}condep: {res:_b[depression] + _b[0.visit#1.depression#1.intgrp] + _b[6.visit#1.depression#1.intgrp] + _b[52.visit#1.depression#1.intgrp] + _b[104.visit#1.depression#1.intgrp] + _b[156.visit#1.depression#1.intgrp] + _b[260.visit#1.depression#1.intgrp] + _b[520.visit#1.depression#1.intgrp]}
+     intnodep: {res:_b[intgrp] + _b[0.visit#0.depression#2.intgrp] + _b[6.visit#0.depression#2.intgrp] + _b[52.visit#0.depression#2.intgrp] + _b[104.visit#0.depression#2.intgrp] + _b[156.visit#0.depression#2.intgrp] + _b[260.visit#0.depression#2.intgrp] + _b[520.visit#0.depression#2.intgrp]}
+       intdep: {res:_b[depression] + _b[intgrp] + _b[0.visit#1.depression#2.intgrp] + _b[6.visit#1.depression#2.intgrp] + _b[52.visit#1.depression#2.intgrp] + _b[104.visit#1.depression#2.intgrp] + _b[156.visit#1.depression#2.intgrp] + _b[260.visit#1.depression#2.intgrp] + _b[520.visit#1.depression#2.intgrp]}
+
+{res}{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}      eemem1{col 14}{c |}      Coef.{col 26}   Std. Err.{col 38}      t{col 46}   P>|t|{col 54}     [95% Con{col 67}f. Interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 6}condep {c |}{col 14}{res}{space 2}-.7288076{col 26}{space 2} .5530277{col 37}{space 1}   -1.32{col 46}{space 3}0.189{col 54}{space 4}-1.818935{col 67}{space 3} .3613195
+{txt}{space 4}intnodep {c |}{col 14}{res}{space 2} .3627096{col 26}{space 2} .3289763{col 37}{space 1}    1.10{col 46}{space 3}0.271{col 54}{space 4}-.2857996{col 67}{space 3} 1.011219
+{txt}{space 6}intdep {c |}{col 14}{res}{space 2}-.0660273{col 26}{space 2} .4363281{col 37}{space 1}   -0.15{col 46}{space 3}0.880{col 54}{space 4}-.9252435{col 67}{space 3} .7931888
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}{txt}
+{com}. 
+. disp "REASONING SCORE DIFFERENCE DEPRESSION VS NON-DEPRESSION FOR TRAINING GROUP"
+{res}REASONING SCORE DIFFERENCE DEPRESSION VS NON-DEPRESSION FOR TRAINING GROUP
+{txt}
+{com}. mi estimate, esampvaryok: mixed reascb1 i.visit depression c_baseage c_yrseduc c_basemmse female i.Race i.visit#depression || id: if intgrp==3
+{res}
+{txt}Multiple-imputation estimates{col 49}Imputations{col 67}= {res}        60
+{txt}Mixed-effects ML regression{col 49}Number of obs{col 67}= {res}     4,893
+
+{txt}Group variable: {res:id}{col 49}Number of groups{col 67}= {res}       699
+{txt}{col 49}Obs per group:
+{col 49}              min{col 67}= {res}         7
+{txt}{col 49}              avg{col 67}= {res}       7.0
+{txt}{col 49}              max{col 67}= {res}         7
+{txt}{col 49}Average RVI{col 67}= {res}    0.5179
+{txt}{col 49}Largest FMI{col 67}= {res}    0.5975
+{txt}DF adjustment:{ralign 15: {res:Large sample}}{col 49}DF:     min{col 67}= {res}    167.95
+{txt}{col 49}        avg{col 67}= {res}  2,380.31
+{txt}{col 49}        max{col 67}= {res} 11,366.54
+{txt}Model F test:{ralign 16: {res:Equal FMI}}{col 49}F({res}  19{txt},{res} 9506.6{txt}){col 67}= {res}     72.20
+{txt}{col 49}Prob > F{col 67}= {res}    0.0000
+
+{txt}{hline 17}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}         reascb1{col 18}{c |}      Coef.{col 30}   Std. Err.{col 42}      t{col 50}   P>|t|{col 58}     [95% Con{col 71}f. Interval]
+{hline 17}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 11}visit {c |}
+{space 14}6  {c |}{col 18}{res}{space 2} .6515538{col 30}{space 2} .0370729{col 41}{space 1}   17.57{col 50}{space 3}0.000{col 58}{space 4} .5788808{col 71}{space 3} .7242267
+{txt}{space 13}52  {c |}{col 18}{res}{space 2} .5082039{col 30}{space 2} .0406214{col 41}{space 1}   12.51{col 50}{space 3}0.000{col 58}{space 4} .4285133{col 71}{space 3} .5878946
+{txt}{space 12}104  {c |}{col 18}{res}{space 2} .4245894{col 30}{space 2} .0396832{col 41}{space 1}   10.70{col 50}{space 3}0.000{col 58}{space 4} .3467624{col 71}{space 3} .5024164
+{txt}{space 12}156  {c |}{col 18}{res}{space 2} .5530681{col 30}{space 2} .0413884{col 41}{space 1}   13.36{col 50}{space 3}0.000{col 58}{space 4} .4718425{col 71}{space 3} .6342937
+{txt}{space 12}260  {c |}{col 18}{res}{space 2} .3789004{col 30}{space 2} .0432263{col 41}{space 1}    8.77{col 50}{space 3}0.000{col 58}{space 4} .2940272{col 71}{space 3} .4637736
+{txt}{space 12}520  {c |}{col 18}{res}{space 2} .2239518{col 30}{space 2} .0500757{col 41}{space 1}    4.47{col 50}{space 3}0.000{col 58}{space 4} .1253632{col 71}{space 3} .3225405
+{txt}{space 16} {c |}
+{space 6}depression {c |}{col 18}{res}{space 2}-.2498153{col 30}{space 2} .0805885{col 41}{space 1}   -3.10{col 50}{space 3}0.002{col 58}{space 4}-.4089122{col 71}{space 3}-.0907185
+{txt}{space 7}c_baseage {c |}{col 18}{res}{space 2}-.0524075{col 30}{space 2} .0038239{col 41}{space 1}  -13.71{col 50}{space 3}0.000{col 58}{space 4}-.0599048{col 71}{space 3}-.0449101
+{txt}{space 7}c_yrseduc {c |}{col 18}{res}{space 2}  .092199{col 30}{space 2} .0077427{col 41}{space 1}   11.91{col 50}{space 3}0.000{col 58}{space 4} .0769182{col 71}{space 3} .1074798
+{txt}{space 6}c_basemmse {c |}{col 18}{res}{space 2}  .162208{col 30}{space 2} .0113192{col 41}{space 1}   14.33{col 50}{space 3}0.000{col 58}{space 4} .1400145{col 71}{space 3} .1844014
+{txt}{space 10}female {c |}{col 18}{res}{space 2} .0539577{col 30}{space 2} .0499608{col 41}{space 1}    1.08{col 50}{space 3}0.280{col 58}{space 4}-.0439861{col 71}{space 3} .1519015
+{txt}{space 16} {c |}
+{space 12}Race {c |}
+{space 10}Black  {c |}{col 18}{res}{space 2}-.5479372{col 30}{space 2} .0489635{col 41}{space 1}  -11.19{col 50}{space 3}0.000{col 58}{space 4}-.6439212{col 71}{space 3}-.4519533
+{txt}{space 10}Other  {c |}{col 18}{res}{space 2}-.3456874{col 30}{space 2}  .153979{col 41}{space 1}   -2.25{col 50}{space 3}0.025{col 58}{space 4}  -.64762{col 71}{space 3}-.0437548
+{txt}{space 16} {c |}
+visit#depression {c |}
+{space 10}  0 1  {c |}{col 18}{res}{space 2}   .19117{col 30}{space 2} .0989045{col 41}{space 1}    1.93{col 50}{space 3}0.054{col 58}{space 4}-.0034375{col 71}{space 3} .3857775
+{txt}{space 10}  6 1  {c |}{col 18}{res}{space 2} .1284533{col 30}{space 2} .0941217{col 41}{space 1}    1.36{col 50}{space 3}0.173{col 58}{space 4}-.0565588{col 71}{space 3} .3134654
+{txt}{space 10} 52 1  {c |}{col 18}{res}{space 2} .1339704{col 30}{space 2} .0978769{col 41}{space 1}    1.37{col 50}{space 3}0.172{col 58}{space 4}-.0586344{col 71}{space 3} .3265753
+{txt}{space 10}104 1  {c |}{col 18}{res}{space 2} .0641245{col 30}{space 2} .1020499{col 41}{space 1}    0.63{col 50}{space 3}0.530{col 58}{space 4} -.136861{col 71}{space 3} .2651099
+{txt}{space 10}156 1  {c |}{col 18}{res}{space 2} .0636851{col 30}{space 2} .1097996{col 41}{space 1}    0.58{col 50}{space 3}0.563{col 58}{space 4} -.152838{col 71}{space 3} .2802082
+{txt}{space 10}260 1  {c |}{col 18}{res}{space 2} .0800908{col 30}{space 2} .1034796{col 41}{space 1}    0.77{col 50}{space 3}0.440{col 58}{space 4}-.1238311{col 71}{space 3} .2840127
+{txt}{space 10}520 1  {c |}{col 18}{res}{space 2}        0{col 30}{txt}  (omitted)
+{space 16} {c |}
+{space 11}_cons {c |}{col 18}{res}{space 2} .3978548{col 30}{space 2} .0503633{col 41}{space 1}    7.90{col 50}{space 3}0.000{col 58}{space 4} .2991339{col 71}{space 3} .4965756
+{txt}{hline 17}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+
+{hline 29}{c TT}{hline 48}
+{col 3}Random-effects Parameters{col 30}{c |}{col 34}Estimate{col 45}Std. Err.{col 59}[95% Conf. Interval]
+{hline 29}{c +}{hline 48}
+{res}id{txt}: Identity{col 30}{c |}
+{col 20}sd(_cons){col 30}{c |}{res}{col 33} .4725705{col 44} .0163338{col 58} .4416091{col 70} .5057025
+{txt}{hline 29}{c +}{hline 48}
+{col 17}sd(Residual){col 30}{c |}{res}{col 33} .5754285{col 44} .0095111{col 58} .5569675{col 70} .5945014
+{txt}{hline 29}{c BT}{hline 48}
+{res}{txt}
+{com}. disp "REASONING SCORE DIFFERENCE DEPRESSION VS NON-DEPRESSION FOR CONTROL GROUP"
+{res}REASONING SCORE DIFFERENCE DEPRESSION VS NON-DEPRESSION FOR CONTROL GROUP
+{txt}
+{com}. mi estimate, esampvaryok: mixed reascb1 i.visit depression c_baseage c_yrseduc c_basemmse female i.Race i.visit#depression || id: if intgrp==1
+{res}
+{txt}Multiple-imputation estimates{col 49}Imputations{col 67}= {res}        60
+{txt}Mixed-effects ML regression{col 49}Number of obs{col 67}= {res}     4,886
+
+{txt}Group variable: {res:id}{col 49}Number of groups{col 67}= {res}       698
+{txt}{col 49}Obs per group:
+{col 49}              min{col 67}= {res}         7
+{txt}{col 49}              avg{col 67}= {res}       7.0
+{txt}{col 49}              max{col 67}= {res}         7
+{txt}{col 49}Average RVI{col 67}= {res}    0.5479
+{txt}{col 49}Largest FMI{col 67}= {res}    0.6384
+{txt}DF adjustment:{ralign 15: {res:Large sample}}{col 49}DF:     min{col 67}= {res}    147.00
+{txt}{col 49}        avg{col 67}= {res}  3,147.20
+{txt}{col 49}        max{col 67}= {res} 19,124.42
+{txt}Model F test:{ralign 16: {res:Equal FMI}}{col 49}F({res}  19{txt},{res} 8798.5{txt}){col 67}= {res}     49.96
+{txt}{col 49}Prob > F{col 67}= {res}    0.0000
+
+{txt}{hline 17}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}         reascb1{col 18}{c |}      Coef.{col 30}   Std. Err.{col 42}      t{col 50}   P>|t|{col 58}     [95% Con{col 71}f. Interval]
+{hline 17}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 11}visit {c |}
+{space 14}6  {c |}{col 18}{res}{space 2} .2668608{col 30}{space 2}  .036382{col 41}{space 1}    7.33{col 50}{space 3}0.000{col 58}{space 4}  .195546{col 71}{space 3} .3381755
+{txt}{space 13}52  {c |}{col 18}{res}{space 2} .1912751{col 30}{space 2} .0401703{col 41}{space 1}    4.76{col 50}{space 3}0.000{col 58}{space 4} .1124667{col 71}{space 3} .2700835
+{txt}{space 12}104  {c |}{col 18}{res}{space 2} .2000632{col 30}{space 2} .0403859{col 41}{space 1}    4.95{col 50}{space 3}0.000{col 58}{space 4} .1208237{col 71}{space 3} .2793028
+{txt}{space 12}156  {c |}{col 18}{res}{space 2} .2374096{col 30}{space 2} .0406953{col 41}{space 1}    5.83{col 50}{space 3}0.000{col 58}{space 4} .1575532{col 71}{space 3}  .317266
+{txt}{space 12}260  {c |}{col 18}{res}{space 2} .1862103{col 30}{space 2}   .04579{col 41}{space 1}    4.07{col 50}{space 3}0.000{col 58}{space 4} .0961864{col 71}{space 3} .2762342
+{txt}{space 12}520  {c |}{col 18}{res}{space 2} .0949116{col 30}{space 2} .0477899{col 41}{space 1}    1.99{col 50}{space 3}0.048{col 58}{space 4} .0008964{col 71}{space 3} .1889268
+{txt}{space 16} {c |}
+{space 6}depression {c |}{col 18}{res}{space 2}-.2588566{col 30}{space 2} .0851454{col 41}{space 1}   -3.04{col 50}{space 3}0.003{col 58}{space 4}-.4271238{col 71}{space 3}-.0905894
+{txt}{space 7}c_baseage {c |}{col 18}{res}{space 2} -.046211{col 30}{space 2} .0035756{col 41}{space 1}  -12.92{col 50}{space 3}0.000{col 58}{space 4} -.053221{col 71}{space 3}-.0392009
+{txt}{space 7}c_yrseduc {c |}{col 18}{res}{space 2} .0917104{col 30}{space 2} .0073346{col 41}{space 1}   12.50{col 50}{space 3}0.000{col 58}{space 4} .0772476{col 71}{space 3} .1061732
+{txt}{space 6}c_basemmse {c |}{col 18}{res}{space 2} .1501257{col 30}{space 2} .0113744{col 41}{space 1}   13.20{col 50}{space 3}0.000{col 58}{space 4} .1278221{col 71}{space 3} .1724293
+{txt}{space 10}female {c |}{col 18}{res}{space 2} .1019574{col 30}{space 2} .0491649{col 41}{space 1}    2.07{col 50}{space 3}0.038{col 58}{space 4} .0055618{col 71}{space 3}  .198353
+{txt}{space 16} {c |}
+{space 12}Race {c |}
+{space 10}Black  {c |}{col 18}{res}{space 2}-.4740382{col 30}{space 2} .0476916{col 41}{space 1}   -9.94{col 50}{space 3}0.000{col 58}{space 4} -.567518{col 71}{space 3}-.3805585
+{txt}{space 10}Other  {c |}{col 18}{res}{space 2}-.4630422{col 30}{space 2} .1460342{col 41}{space 1}   -3.17{col 50}{space 3}0.002{col 58}{space 4}-.7493364{col 71}{space 3}-.1767481
+{txt}{space 16} {c |}
+visit#depression {c |}
+{space 10}  0 1  {c |}{col 18}{res}{space 2} .0429968{col 30}{space 2} .1030671{col 41}{space 1}    0.42{col 50}{space 3}0.677{col 58}{space 4}-.1599423{col 71}{space 3}  .245936
+{txt}{space 10}  6 1  {c |}{col 18}{res}{space 2} .0553361{col 30}{space 2} .1006505{col 41}{space 1}    0.55{col 50}{space 3}0.583{col 58}{space 4}-.1427478{col 71}{space 3}   .25342
+{txt}{space 10} 52 1  {c |}{col 18}{res}{space 2} .0927089{col 30}{space 2} .1122766{col 41}{space 1}    0.83{col 50}{space 3}0.410{col 58}{space 4}-.1287772{col 71}{space 3} .3141949
+{txt}{space 10}104 1  {c |}{col 18}{res}{space 2} .0878763{col 30}{space 2} .1057358{col 41}{space 1}    0.83{col 50}{space 3}0.407{col 58}{space 4}-.1204362{col 71}{space 3} .2961888
+{txt}{space 10}156 1  {c |}{col 18}{res}{space 2} .0855983{col 30}{space 2}  .109695{col 41}{space 1}    0.78{col 50}{space 3}0.436{col 58}{space 4}-.1306727{col 71}{space 3} .3018694
+{txt}{space 10}260 1  {c |}{col 18}{res}{space 2} .0233723{col 30}{space 2} .1122675{col 41}{space 1}    0.21{col 50}{space 3}0.835{col 58}{space 4}-.1981637{col 71}{space 3} .2449082
+{txt}{space 10}520 1  {c |}{col 18}{res}{space 2}        0{col 30}{txt}  (omitted)
+{space 16} {c |}
+{space 11}_cons {c |}{col 18}{res}{space 2} .3599205{col 30}{space 2} .0482048{col 41}{space 1}    7.47{col 50}{space 3}0.000{col 58}{space 4} .2654318{col 71}{space 3} .4544093
+{txt}{hline 17}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+
+{hline 29}{c TT}{hline 48}
+{col 3}Random-effects Parameters{col 30}{c |}{col 34}Estimate{col 45}Std. Err.{col 59}[95% Conf. Interval]
+{hline 29}{c +}{hline 48}
+{res}id{txt}: Identity{col 30}{c |}
+{col 20}sd(_cons){col 30}{c |}{res}{col 33} .4752137{col 44} .0164219{col 58} .4440853{col 70} .5085242
+{txt}{hline 29}{c +}{hline 48}
+{col 17}sd(Residual){col 30}{c |}{res}{col 33} .5734299{col 44} .0095149{col 58} .5549616{col 70} .5925128
+{txt}{hline 29}{c BT}{hline 48}
+{res}{txt}
+{com}. disp "REASONING SCORE DIFFERENCE DEPRESSION VS NON-DEPRESSION FOR INTERVENTION VS TRAINING GROUP"
+{res}REASONING SCORE DIFFERENCE DEPRESSION VS NON-DEPRESSION FOR INTERVENTION VS TRAINING GROUP
+{txt}
+{com}. mi estimate (condep: _b[depression] + _b[0.visit#1.depression#1.intgrp] + _b[6.visit#1.depression#1.intgrp] + _b[52.visit#1.depression#1.intgrp] + _b[104.visit#1.depression#1.intgrp] + _b[156.visit#1.depression#1.intgrp] + _b[260.visit#1.depression#1.intgrp] + _b[520.visit#1.depression#1.intgrp]) (intnodep: _b[intgrp] + _b[0.visit#0.depression#3.intgrp] + _b[6.visit#0.depression#3.intgrp] + _b[52.visit#0.depression#3.intgrp] + _b[104.visit#0.depression#3.intgrp] + _b[156.visit#0.depression#3.intgrp] + _b[260.visit#0.depression#3.intgrp] + _b[520.visit#0.depression#3.intgrp]) (intdep: _b[depression] + _b[intgrp] + _b[0.visit#1.depression#3.intgrp] + _b[6.visit#1.depression#3.intgrp] + _b[52.visit#1.depression#3.intgrp] + _b[104.visit#1.depression#3.intgrp] + _b[156.visit#1.depression#3.intgrp] + _b[260.visit#1.depression#3.intgrp] + _b[520.visit#1.depression#3.intgrp]), esampvaryok: mixed reascb1 i.visit intgrp depression c_baseage c_yrseduc c_basemmse female i.Race i.visit#intgrp#depression || id: if intgrp==3 | intgrp==1 
+{res}
+{txt}Multiple-imputation estimates{col 49}Imputations{col 67}= {res}        60
+{txt}Mixed-effects ML regression{col 49}Number of obs{col 67}= {res}     9,779
+
+{txt}Group variable: {res:id}{col 49}Number of groups{col 67}= {res}     1,397
+{txt}{col 49}Obs per group:
+{col 49}              min{col 67}= {res}         7
+{txt}{col 49}              avg{col 67}= {res}       7.0
+{txt}{col 49}              max{col 67}= {res}         7
+{txt}{col 49}Average RVI{col 67}= {res}    0.5702
+{txt}{col 49}Largest FMI{col 67}= {res}    0.6462
+{txt}DF adjustment:{ralign 15: {res:Large sample}}{col 49}DF:     min{col 67}= {res}    143.44
+{txt}{col 49}        avg{col 67}= {res}  1,354.11
+{txt}{col 49}        max{col 67}= {res} 11,729.99
+{txt}Model F test:{ralign 16: {res:Equal FMI}}{col 49}F({res}  33{txt},{res}14704.2{txt}){col 67}= {res}     69.89
+{txt}{col 49}Prob > F{col 67}= {res}    0.0000
+
+{txt}{hline 24}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}                reascb1{col 25}{c |}      Coef.{col 37}   Std. Err.{col 49}      t{col 57}   P>|t|{col 65}     [95% Con{col 78}f. Interval]
+{hline 24}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 18}visit {c |}
+{space 21}6  {c |}{col 25}{res}{space 2} .2668574{col 37}{space 2} .0364445{col 48}{space 1}    7.32{col 57}{space 3}0.000{col 65}{space 4}   .19542{col 78}{space 3} .3382948
+{txt}{space 20}52  {c |}{col 25}{res}{space 2}  .191504{col 37}{space 2} .0401892{col 48}{space 1}    4.77{col 57}{space 3}0.000{col 65}{space 4} .1126599{col 78}{space 3} .2703481
+{txt}{space 19}104  {c |}{col 25}{res}{space 2} .2002464{col 37}{space 2} .0404214{col 48}{space 1}    4.95{col 57}{space 3}0.000{col 65}{space 4} .1209383{col 78}{space 3} .2795545
+{txt}{space 19}156  {c |}{col 25}{res}{space 2} .2376455{col 37}{space 2} .0407463{col 48}{space 1}    5.83{col 57}{space 3}0.000{col 65}{space 4} .1576896{col 78}{space 3} .3176013
+{txt}{space 19}260  {c |}{col 25}{res}{space 2} .1865171{col 37}{space 2}  .045836{col 48}{space 1}    4.07{col 57}{space 3}0.000{col 65}{space 4} .0964043{col 78}{space 3}   .27663
+{txt}{space 19}520  {c |}{col 25}{res}{space 2} .0952755{col 37}{space 2}  .047795{col 48}{space 1}    1.99{col 57}{space 3}0.047{col 65}{space 4} .0012532{col 78}{space 3} .1892978
+{txt}{space 23} {c |}
+{space 17}intgrp {c |}{col 25}{res}{space 2} .0565172{col 37}{space 2} .0317131{col 48}{space 1}    1.78{col 57}{space 3}0.076{col 65}{space 4}-.0059563{col 78}{space 3} .1189907
+{txt}{space 13}depression {c |}{col 25}{res}{space 2}-.2520699{col 37}{space 2} .0805415{col 48}{space 1}   -3.13{col 57}{space 3}0.002{col 65}{space 4}-.4110797{col 78}{space 3}-.0930601
+{txt}{space 14}c_baseage {c |}{col 25}{res}{space 2}-.0491358{col 37}{space 2} .0026675{col 48}{space 1}  -18.42{col 57}{space 3}0.000{col 65}{space 4}-.0543666{col 78}{space 3} -.043905
+{txt}{space 14}c_yrseduc {c |}{col 25}{res}{space 2} .0918913{col 37}{space 2} .0055107{col 48}{space 1}   16.68{col 57}{space 3}0.000{col 65}{space 4} .0810129{col 78}{space 3} .1027697
+{txt}{space 13}c_basemmse {c |}{col 25}{res}{space 2} .1566378{col 37}{space 2} .0081629{col 48}{space 1}   19.19{col 57}{space 3}0.000{col 65}{space 4} .1406295{col 78}{space 3} .1726462
+{txt}{space 17}female {c |}{col 25}{res}{space 2} .0784784{col 37}{space 2} .0352845{col 48}{space 1}    2.22{col 57}{space 3}0.026{col 65}{space 4} .0092984{col 78}{space 3} .1476584
+{txt}{space 23} {c |}
+{space 19}Race {c |}
+{space 17}Black  {c |}{col 25}{res}{space 2} -.510554{col 37}{space 2} .0342536{col 48}{space 1}  -14.91{col 57}{space 3}0.000{col 65}{space 4}-.5776979{col 78}{space 3}  -.44341
+{txt}{space 17}Other  {c |}{col 25}{res}{space 2}-.4060882{col 37}{space 2}  .106199{col 48}{space 1}   -3.82{col 57}{space 3}0.000{col 65}{space 4}-.6143079{col 78}{space 3}-.1978685
+{txt}{space 23} {c |}
+visit#intgrp#depression {c |}
+{space 15}  0 1 1  {c |}{col 25}{res}{space 2} .0402481{col 37}{space 2} .1013218{col 48}{space 1}    0.40{col 57}{space 3}0.691{col 65}{space 4}-.1591475{col 78}{space 3} .2396438
+{txt}{space 15}  0 3 0  {c |}{col 25}{res}{space 2}-.1286786{col 37}{space 2}  .068351{col 48}{space 1}   -1.88{col 57}{space 3}0.061{col 65}{space 4}-.2631622{col 78}{space 3} .0058049
+{txt}{space 15}  0 3 1  {c |}{col 25}{res}{space 2} .0620916{col 37}{space 2} .0919881{col 48}{space 1}    0.67{col 57}{space 3}0.500{col 65}{space 4}-.1187377{col 78}{space 3} .2429208
+{txt}{space 15}  6 1 1  {c |}{col 25}{res}{space 2} .0526147{col 37}{space 2} .1023252{col 48}{space 1}    0.51{col 57}{space 3}0.608{col 65}{space 4}-.1487948{col 78}{space 3} .2540242
+{txt}{space 15}  6 3 0  {c |}{col 25}{res}{space 2} .2560071{col 37}{space 2} .0674796{col 48}{space 1}    3.79{col 57}{space 3}0.000{col 65}{space 4} .1232717{col 78}{space 3} .3887426
+{txt}{space 15}  6 3 1  {c |}{col 25}{res}{space 2} .3840601{col 37}{space 2} .0911896{col 48}{space 1}    4.21{col 57}{space 3}0.000{col 65}{space 4} .2048331{col 78}{space 3}  .563287
+{txt}{space 15} 52 1 1  {c |}{col 25}{res}{space 2} .0888267{col 37}{space 2} .1079711{col 48}{space 1}    0.82{col 57}{space 3}0.412{col 65}{space 4}-.1239687{col 78}{space 3} .3016221
+{txt}{space 15} 52 3 0  {c |}{col 25}{res}{space 2} .1879015{col 37}{space 2} .0691234{col 48}{space 1}    2.72{col 57}{space 3}0.007{col 65}{space 4} .0518752{col 78}{space 3} .3239278
+{txt}{space 15} 52 3 1  {c |}{col 25}{res}{space 2} .3221343{col 37}{space 2} .0935881{col 48}{space 1}    3.44{col 57}{space 3}0.001{col 65}{space 4} .1380433{col 78}{space 3} .5062253
+{txt}{space 15}104 1 1  {c |}{col 25}{res}{space 2} .0843556{col 37}{space 2} .1071998{col 48}{space 1}    0.79{col 57}{space 3}0.432{col 65}{space 4} -.126872{col 78}{space 3} .2955833
+{txt}{space 15}104 3 0  {c |}{col 25}{res}{space 2} .0957366{col 37}{space 2} .0708965{col 48}{space 1}    1.35{col 57}{space 3}0.178{col 65}{space 4}-.0438539{col 78}{space 3} .2353272
+{txt}{space 15}104 3 1  {c |}{col 25}{res}{space 2} .1594107{col 37}{space 2} .0985336{col 48}{space 1}    1.62{col 57}{space 3}0.107{col 65}{space 4}-.0346096{col 78}{space 3}  .353431
+{txt}{space 15}156 1 1  {c |}{col 25}{res}{space 2} .0817898{col 37}{space 2} .1100474{col 48}{space 1}    0.74{col 57}{space 3}0.458{col 65}{space 4}-.1351561{col 78}{space 3} .2987357
+{txt}{space 15}156 3 0  {c |}{col 25}{res}{space 2} .1865774{col 37}{space 2} .0726922{col 48}{space 1}    2.57{col 57}{space 3}0.011{col 65}{space 4} .0433679{col 78}{space 3} .3297869
+{txt}{space 15}156 3 1  {c |}{col 25}{res}{space 2} .2504014{col 37}{space 2} .0953157{col 48}{space 1}    2.63{col 57}{space 3}0.009{col 65}{space 4} .0628927{col 78}{space 3} .4379102
+{txt}{space 15}260 1 1  {c |}{col 25}{res}{space 2} .0190352{col 37}{space 2} .1233373{col 48}{space 1}    0.15{col 57}{space 3}0.878{col 65}{space 4}-.2247583{col 78}{space 3} .2628287
+{txt}{space 15}260 3 0  {c |}{col 25}{res}{space 2} .0636741{col 37}{space 2} .0746006{col 48}{space 1}    0.85{col 57}{space 3}0.394{col 65}{space 4}-.0833423{col 78}{space 3} .2106906
+{txt}{space 15}260 3 1  {c |}{col 25}{res}{space 2} .1437281{col 37}{space 2} .0984908{col 48}{space 1}    1.46{col 57}{space 3}0.146{col 65}{space 4}-.0502637{col 78}{space 3} .3377198
+{txt}{space 15}520 1 1  {c |}{col 25}{res}{space 2}-.0047051{col 37}{space 2}  .116576{col 48}{space 1}   -0.04{col 57}{space 3}0.968{col 65}{space 4}-.2349519{col 78}{space 3} .2255417
+{txt}{space 15}520 3 0  {c |}{col 25}{res}{space 2}        0{col 37}{txt}  (omitted)
+{space 15}520 3 1  {c |}{col 25}{res}{space 2}        0{col 37}{txt}  (omitted)
+{space 23} {c |}
+{space 18}_cons {c |}{col 25}{res}{space 2} .3298244{col 37}{space 2} .0539543{col 48}{space 1}    6.11{col 57}{space 3}0.000{col 65}{space 4} .2240068{col 78}{space 3} .4356419
+{txt}{hline 24}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+
+{hline 29}{c TT}{hline 48}
+{col 3}Random-effects Parameters{col 30}{c |}{col 34}Estimate{col 45}Std. Err.{col 59}[95% Conf. Interval]
+{hline 29}{c +}{hline 48}
+{res}id{txt}: Identity{col 30}{c |}
+{col 20}sd(_cons){col 30}{c |}{res}{col 33} .4750969{col 44} .0116898{col 58} .4527217{col 70}  .498578
+{txt}{hline 29}{c +}{hline 48}
+{col 17}sd(Residual){col 30}{c |}{res}{col 33} .5745137{col 44} .0069491{col 58} .5609576{col 70} .5883973
+{txt}{hline 29}{c BT}{hline 48}
+
+Transformations{col 49}Average RVI{col 67}= {res}    1.0706
+{txt}{col 49}Largest FMI{col 67}= {res}    0.6153
+{txt}DF adjustment:{ralign 15: {res:Large sample}}{col 49}DF:     min{col 67}= {res}    158.33
+{txt}{col 49}        avg{col 67}= {res}    212.51
+{txt}{col 49}        max{col 67}= {res}    271.67
+
+       {txt}condep: {res:_b[depression] + _b[0.visit#1.depression#1.intgrp] + _b[6.visit#1.depression#1.intgrp] + _b[52.visit#1.depression#1.intgrp] + _b[104.visit#1.depression#1.intgrp] + _b[156.visit#1.depression#1.intgrp] + _b[260.visit#1.depression#1.intgrp] + _b[520.visit#1.depression#1.intgrp]}
+     intnodep: {res:_b[intgrp] + _b[0.visit#0.depression#3.intgrp] + _b[6.visit#0.depression#3.intgrp] + _b[52.visit#0.depression#3.intgrp] + _b[104.visit#0.depression#3.intgrp] + _b[156.visit#0.depression#3.intgrp] + _b[260.visit#0.depression#3.intgrp] + _b[520.visit#0.depression#3.intgrp]}
+       intdep: {res:_b[depression] + _b[intgrp] + _b[0.visit#1.depression#3.intgrp] + _b[6.visit#1.depression#3.intgrp] + _b[52.visit#1.depression#3.intgrp] + _b[104.visit#1.depression#3.intgrp] + _b[156.visit#1.depression#3.intgrp] + _b[260.visit#1.depression#3.intgrp] + _b[520.visit#1.depression#3.intgrp]}
+
+{res}{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}     reascb1{col 14}{c |}      Coef.{col 26}   Std. Err.{col 38}      t{col 46}   P>|t|{col 54}     [95% Con{col 67}f. Interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 6}condep {c |}{col 14}{res}{space 2} .1100953{col 26}{space 2} .5548708{col 37}{space 1}    0.20{col 46}{space 3}0.843{col 54}{space 4}-.9858082{col 67}{space 3} 1.205999
+{txt}{space 4}intnodep {c |}{col 14}{res}{space 2} .7177353{col 26}{space 2} .3256416{col 37}{space 1}    2.20{col 46}{space 3}0.029{col 54}{space 4} .0757455{col 67}{space 3} 1.359725
+{txt}{space 6}intdep {c |}{col 14}{res}{space 2} 1.126273{col 26}{space 2} .3944398{col 37}{space 1}    2.86{col 46}{space 3}0.005{col 54}{space 4} .3497262{col 67}{space 3} 1.902821
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}{txt}
+{com}. 
+. disp "SPPED SCORE DIFFERENCE DEPRESSION VS NON-DEPRESSION FOR TRAINING GROUP"
+{res}SPPED SCORE DIFFERENCE DEPRESSION VS NON-DEPRESSION FOR TRAINING GROUP
+{txt}
+{com}. mi estimate, esampvaryok: mixed spdcb1 i.visit depression c_baseage c_yrseduc c_basemmse female i.Race i.visit#depression || id: if intgrp==4
+{res}
+{txt}Multiple-imputation estimates{col 49}Imputations{col 67}= {res}        60
+{txt}Mixed-effects ML regression{col 49}Number of obs{col 67}= {res}     4,914
+
+{txt}Group variable: {res:id}{col 49}Number of groups{col 67}= {res}       702
+{txt}{col 49}Obs per group:
+{col 49}              min{col 67}= {res}         7
+{txt}{col 49}              avg{col 67}= {res}       7.0
+{txt}{col 49}              max{col 67}= {res}         7
+{txt}{col 49}Average RVI{col 67}= {res}    0.4187
+{txt}{col 49}Largest FMI{col 67}= {res}    0.5877
+{txt}DF adjustment:{ralign 15: {res:Large sample}}{col 49}DF:     min{col 67}= {res}    173.59
+{txt}{col 49}        avg{col 67}= {res}  3,081.35
+{txt}{col 49}        max{col 67}= {res} 14,653.12
+{txt}Model F test:{ralign 16: {res:Equal FMI}}{col 49}F({res}  19{txt},{res}13240.2{txt}){col 67}= {res}     81.16
+{txt}{col 49}Prob > F{col 67}= {res}    0.0000
+
+{txt}{hline 17}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}          spdcb1{col 18}{c |}      Coef.{col 30}   Std. Err.{col 42}      t{col 50}   P>|t|{col 58}     [95% Con{col 71}f. Interval]
+{hline 17}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 11}visit {c |}
+{space 14}6  {c |}{col 18}{res}{space 2}-1.564391{col 30}{space 2}   .05362{col 41}{space 1}  -29.18{col 50}{space 3}0.000{col 58}{space 4}-1.669493{col 71}{space 3}-1.459289
+{txt}{space 13}52  {c |}{col 18}{res}{space 2}-1.281128{col 30}{space 2} .0575977{col 41}{space 1}  -22.24{col 50}{space 3}0.000{col 58}{space 4}-1.394086{col 71}{space 3}-1.168171
+{txt}{space 12}104  {c |}{col 18}{res}{space 2}-1.031436{col 30}{space 2} .0576735{col 41}{space 1}  -17.88{col 50}{space 3}0.000{col 58}{space 4} -1.14454{col 71}{space 3}-.9183316
+{txt}{space 12}156  {c |}{col 18}{res}{space 2}-1.075635{col 30}{space 2} .0584682{col 41}{space 1}  -18.40{col 50}{space 3}0.000{col 58}{space 4}-1.190322{col 71}{space 3} -.960947
+{txt}{space 12}260  {c |}{col 18}{res}{space 2}-.7981708{col 30}{space 2} .0613431{col 41}{space 1}  -13.01{col 50}{space 3}0.000{col 58}{space 4}-.9185666{col 71}{space 3} -.677775
+{txt}{space 12}520  {c |}{col 18}{res}{space 2}-.3781521{col 30}{space 2} .0657949{col 41}{space 1}   -5.75{col 50}{space 3}0.000{col 58}{space 4}-.5074103{col 71}{space 3} -.248894
+{txt}{space 16} {c |}
+{space 6}depression {c |}{col 18}{res}{space 2} .2450034{col 30}{space 2} .1184649{col 41}{space 1}    2.07{col 50}{space 3}0.040{col 58}{space 4} .0111864{col 71}{space 3} .4788204
+{txt}{space 7}c_baseage {c |}{col 18}{res}{space 2}  .090607{col 30}{space 2} .0051108{col 41}{space 1}   17.73{col 50}{space 3}0.000{col 58}{space 4} .0805855{col 71}{space 3} .1006286
+{txt}{space 7}c_yrseduc {c |}{col 18}{res}{space 2}-.0203092{col 30}{space 2} .0099261{col 41}{space 1}   -2.05{col 50}{space 3}0.042{col 58}{space 4}-.0398482{col 71}{space 3}-.0007702
+{txt}{space 6}c_basemmse {c |}{col 18}{res}{space 2}-.0889184{col 30}{space 2} .0149078{col 41}{space 1}   -5.96{col 50}{space 3}0.000{col 58}{space 4}-.1181457{col 71}{space 3} -.059691
+{txt}{space 10}female {c |}{col 18}{res}{space 2}-.0169932{col 30}{space 2} .0658203{col 41}{space 1}   -0.26{col 50}{space 3}0.796{col 58}{space 4}-.1460229{col 71}{space 3} .1120365
+{txt}{space 16} {c |}
+{space 12}Race {c |}
+{space 10}Black  {c |}{col 18}{res}{space 2}  .278455{col 30}{space 2} .0669268{col 41}{space 1}    4.16{col 50}{space 3}0.000{col 58}{space 4} .1472542{col 71}{space 3} .4096558
+{txt}{space 10}Other  {c |}{col 18}{res}{space 2} .2108345{col 30}{space 2} .2305624{col 41}{space 1}    0.91{col 50}{space 3}0.361{col 58}{space 4}-.2411151{col 71}{space 3} .6627841
+{txt}{space 16} {c |}
+visit#depression {c |}
+{space 10}  0 1  {c |}{col 18}{res}{space 2}-.2811551{col 30}{space 2} .1450846{col 41}{space 1}   -1.94{col 50}{space 3}0.053{col 58}{space 4}-.5665073{col 71}{space 3} .0041971
+{txt}{space 10}  6 1  {c |}{col 18}{res}{space 2}-.1439792{col 30}{space 2} .1493664{col 41}{space 1}   -0.96{col 50}{space 3}0.336{col 58}{space 4}-.4379251{col 71}{space 3} .1499666
+{txt}{space 10} 52 1  {c |}{col 18}{res}{space 2}-.0868473{col 30}{space 2} .1537079{col 41}{space 1}   -0.57{col 50}{space 3}0.573{col 58}{space 4}-.3895464{col 71}{space 3} .2158519
+{txt}{space 10}104 1  {c |}{col 18}{res}{space 2} .0004923{col 30}{space 2} .1503761{col 41}{space 1}    0.00{col 50}{space 3}0.997{col 58}{space 4}-.2955329{col 71}{space 3} .2965174
+{txt}{space 10}156 1  {c |}{col 18}{res}{space 2} .0749165{col 30}{space 2}  .158173{col 41}{space 1}    0.47{col 50}{space 3}0.636{col 58}{space 4}-.2367363{col 71}{space 3} .3865692
+{txt}{space 10}260 1  {c |}{col 18}{res}{space 2}-.0334825{col 30}{space 2} .1515508{col 41}{space 1}   -0.22{col 50}{space 3}0.825{col 58}{space 4}-.3319263{col 71}{space 3} .2649613
+{txt}{space 10}520 1  {c |}{col 18}{res}{space 2}        0{col 30}{txt}  (omitted)
+{space 16} {c |}
+{space 11}_cons {c |}{col 18}{res}{space 2}-.2421355{col 30}{space 2} .0688783{col 41}{space 1}   -3.52{col 50}{space 3}0.000{col 58}{space 4}-.3771482{col 71}{space 3}-.1071229
+{txt}{hline 17}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+
+{hline 29}{c TT}{hline 48}
+{col 3}Random-effects Parameters{col 30}{c |}{col 34}Estimate{col 45}Std. Err.{col 59}[95% Conf. Interval]
+{hline 29}{c +}{hline 48}
+{res}id{txt}: Identity{col 30}{c |}
+{col 20}sd(_cons){col 30}{c |}{res}{col 33} .6117543{col 44} .0227204{col 58} .5687873{col 70} .6579671
+{txt}{hline 29}{c +}{hline 48}
+{col 17}sd(Residual){col 30}{c |}{res}{col 33} .8526502{col 44} .0137701{col 58}  .825924{col 70} .8802413
+{txt}{hline 29}{c BT}{hline 48}
+{res}{txt}
+{com}. disp "SPEED SCORE DIFFERENCE DEPRESSION VS NON-DEPRESSION FOR CONTROL GROUP"
+{res}SPEED SCORE DIFFERENCE DEPRESSION VS NON-DEPRESSION FOR CONTROL GROUP
+{txt}
+{com}. mi estimate, esampvaryok: mixed spdcb1 i.visit depression c_baseage c_yrseduc c_basemmse female i.Race i.visit#depression || id: if intgrp==1
+{res}
+{txt}Multiple-imputation estimates{col 49}Imputations{col 67}= {res}        60
+{txt}Mixed-effects ML regression{col 49}Number of obs{col 67}= {res}     4,886
+
+{txt}Group variable: {res:id}{col 49}Number of groups{col 67}= {res}       698
+{txt}{col 49}Obs per group:
+{col 49}              min{col 67}= {res}         7
+{txt}{col 49}              avg{col 67}= {res}       7.0
+{txt}{col 49}              max{col 67}= {res}         7
+{txt}{col 49}Average RVI{col 67}= {res}    0.4968
+{txt}{col 49}Largest FMI{col 67}= {res}    0.5721
+{txt}DF adjustment:{ralign 15: {res:Large sample}}{col 49}DF:     min{col 67}= {res}    183.24
+{txt}{col 49}        avg{col 67}= {res}  1,689.03
+{txt}{col 49}        max{col 67}= {res}  7,875.08
+{txt}Model F test:{ralign 16: {res:Equal FMI}}{col 49}F({res}  19{txt},{res}10414.8{txt}){col 67}= {res}     30.94
+{txt}{col 49}Prob > F{col 67}= {res}    0.0000
+
+{txt}{hline 17}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}          spdcb1{col 18}{c |}      Coef.{col 30}   Std. Err.{col 42}      t{col 50}   P>|t|{col 58}     [95% Con{col 71}f. Interval]
+{hline 17}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 11}visit {c |}
+{space 14}6  {c |}{col 18}{res}{space 2}-.3778368{col 30}{space 2} .0507835{col 41}{space 1}   -7.44{col 50}{space 3}0.000{col 58}{space 4}-.4773859{col 71}{space 3}-.2782877
+{txt}{space 13}52  {c |}{col 18}{res}{space 2}-.3712212{col 30}{space 2} .0552522{col 41}{space 1}   -6.72{col 50}{space 3}0.000{col 58}{space 4}-.4796112{col 71}{space 3}-.2628312
+{txt}{space 12}104  {c |}{col 18}{res}{space 2}-.4077396{col 30}{space 2} .0532396{col 41}{space 1}   -7.66{col 50}{space 3}0.000{col 58}{space 4}-.5121367{col 71}{space 3}-.3033426
+{txt}{space 12}156  {c |}{col 18}{res}{space 2}-.4394865{col 30}{space 2} .0575883{col 41}{space 1}   -7.63{col 50}{space 3}0.000{col 58}{space 4}-.5525344{col 71}{space 3}-.3264386
+{txt}{space 12}260  {c |}{col 18}{res}{space 2} -.367443{col 30}{space 2} .0561389{col 41}{space 1}   -6.55{col 50}{space 3}0.000{col 58}{space 4}-.4775846{col 71}{space 3}-.2573014
+{txt}{space 12}520  {c |}{col 18}{res}{space 2}-.2262646{col 30}{space 2} .0649087{col 41}{space 1}   -3.49{col 50}{space 3}0.001{col 58}{space 4}-.3539144{col 71}{space 3}-.0986147
+{txt}{space 16} {c |}
+{space 6}depression {c |}{col 18}{res}{space 2} .2564784{col 30}{space 2} .1043178{col 41}{space 1}    2.46{col 50}{space 3}0.015{col 58}{space 4}   .05079{col 71}{space 3} .4621668
+{txt}{space 7}c_baseage {c |}{col 18}{res}{space 2} .0748055{col 30}{space 2} .0040362{col 41}{space 1}   18.53{col 50}{space 3}0.000{col 58}{space 4} .0668903{col 71}{space 3} .0827207
+{txt}{space 7}c_yrseduc {c |}{col 18}{res}{space 2}-.0319987{col 30}{space 2} .0097481{col 41}{space 1}   -3.28{col 50}{space 3}0.001{col 58}{space 4}-.0512316{col 71}{space 3}-.0127657
+{txt}{space 6}c_basemmse {c |}{col 18}{res}{space 2} -.094406{col 30}{space 2} .0129359{col 41}{space 1}   -7.30{col 50}{space 3}0.000{col 58}{space 4}-.1197803{col 71}{space 3}-.0690316
+{txt}{space 10}female {c |}{col 18}{res}{space 2} .0373916{col 30}{space 2} .0559381{col 41}{space 1}    0.67{col 50}{space 3}0.504{col 58}{space 4}-.0723225{col 71}{space 3} .1471057
+{txt}{space 16} {c |}
+{space 12}Race {c |}
+{space 10}Black  {c |}{col 18}{res}{space 2} .2286021{col 30}{space 2} .0538582{col 41}{space 1}    4.24{col 50}{space 3}0.000{col 58}{space 4} .1230166{col 71}{space 3} .3341877
+{txt}{space 10}Other  {c |}{col 18}{res}{space 2} .1148828{col 30}{space 2} .1715483{col 41}{space 1}    0.67{col 50}{space 3}0.503{col 58}{space 4}-.2216934{col 71}{space 3} .4514591
+{txt}{space 16} {c |}
+visit#depression {c |}
+{space 10}  0 1  {c |}{col 18}{res}{space 2} -.197149{col 30}{space 2} .1290461{col 41}{space 1}   -1.53{col 50}{space 3}0.127{col 58}{space 4}-.4507724{col 71}{space 3} .0564745
+{txt}{space 10}  6 1  {c |}{col 18}{res}{space 2}-.1452225{col 30}{space 2} .1313294{col 41}{space 1}   -1.11{col 50}{space 3}0.269{col 58}{space 4}  -.40342{col 71}{space 3} .1129751
+{txt}{space 10} 52 1  {c |}{col 18}{res}{space 2}-.1414441{col 30}{space 2} .1306744{col 41}{space 1}   -1.08{col 50}{space 3}0.280{col 58}{space 4}-.3983538{col 71}{space 3} .1154656
+{txt}{space 10}104 1  {c |}{col 18}{res}{space 2}-.0863067{col 30}{space 2} .1385967{col 41}{space 1}   -0.62{col 50}{space 3}0.534{col 58}{space 4}-.3590954{col 71}{space 3} .1864819
+{txt}{space 10}156 1  {c |}{col 18}{res}{space 2}-.0583819{col 30}{space 2} .1521135{col 41}{space 1}   -0.38{col 50}{space 3}0.702{col 58}{space 4}-.3583397{col 71}{space 3} .2415758
+{txt}{space 10}260 1  {c |}{col 18}{res}{space 2}-.0372458{col 30}{space 2} .1456249{col 41}{space 1}   -0.26{col 50}{space 3}0.798{col 58}{space 4}-.3242661{col 71}{space 3} .2497746
+{txt}{space 10}520 1  {c |}{col 18}{res}{space 2}        0{col 30}{txt}  (omitted)
+{space 16} {c |}
+{space 11}_cons {c |}{col 18}{res}{space 2}-.3396827{col 30}{space 2} .0574881{col 41}{space 1}   -5.91{col 50}{space 3}0.000{col 58}{space 4}-.4523766{col 71}{space 3}-.2269888
+{txt}{hline 17}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+
+{hline 29}{c TT}{hline 48}
+{col 3}Random-effects Parameters{col 30}{c |}{col 34}Estimate{col 45}Std. Err.{col 59}[95% Conf. Interval]
+{hline 29}{c +}{hline 48}
+{res}id{txt}: Identity{col 30}{c |}
+{col 20}sd(_cons){col 30}{c |}{res}{col 33} .4881128{col 44} .0200269{col 58} .4503738{col 70} .5290142
+{txt}{hline 29}{c +}{hline 48}
+{col 17}sd(Residual){col 30}{c |}{res}{col 33}   .79375{col 44} .0131852{col 58} .7681574{col 70} .8201951
+{txt}{hline 29}{c BT}{hline 48}
+{res}{txt}
+{com}. disp "SPEED SCORE DIFFERENCE DEPRESSION VS NON-DEPRESSION FOR INTERVENTION VS TRAINING GROUP"
+{res}SPEED SCORE DIFFERENCE DEPRESSION VS NON-DEPRESSION FOR INTERVENTION VS TRAINING GROUP
+{txt}
+{com}. mi estimate (condep: _b[depression] + _b[0.visit#1.depression#1.intgrp] + _b[6.visit#1.depression#1.intgrp] + _b[52.visit#1.depression#1.intgrp] + _b[104.visit#1.depression#1.intgrp] + _b[156.visit#1.depression#1.intgrp] + _b[260.visit#1.depression#1.intgrp] + _b[520.visit#1.depression#1.intgrp]) (intnodep: _b[intgrp] + _b[0.visit#0.depression#4.intgrp] + _b[6.visit#0.depression#4.intgrp] + _b[52.visit#0.depression#4.intgrp] + _b[104.visit#0.depression#4.intgrp] + _b[156.visit#0.depression#4.intgrp] + _b[260.visit#0.depression#4.intgrp] + _b[520.visit#0.depression#4.intgrp]) (intdep: _b[depression] + _b[intgrp] + _b[0.visit#1.depression#4.intgrp] + _b[6.visit#1.depression#4.intgrp] + _b[52.visit#1.depression#4.intgrp] + _b[104.visit#1.depression#4.intgrp] + _b[156.visit#1.depression#4.intgrp] + _b[260.visit#1.depression#4.intgrp] + _b[520.visit#1.depression#4.intgrp]), esampvaryok : mixed spdcb1 i.visit intgrp depression c_baseage c_yrseduc c_basemmse female i.Race i.visit#intgrp#depression || id: if intgrp==4 | intgrp==1 
+{res}
+{txt}Multiple-imputation estimates{col 49}Imputations{col 67}= {res}        60
+{txt}Mixed-effects ML regression{col 49}Number of obs{col 67}= {res}     9,800
+
+{txt}Group variable: {res:id}{col 49}Number of groups{col 67}= {res}     1,400
+{txt}{col 49}Obs per group:
+{col 49}              min{col 67}= {res}         7
+{txt}{col 49}              avg{col 67}= {res}       7.0
+{txt}{col 49}              max{col 67}= {res}         7
+{txt}{col 49}Average RVI{col 67}= {res}    0.4664
+{txt}{col 49}Largest FMI{col 67}= {res}    0.5998
+{txt}DF adjustment:{ralign 15: {res:Large sample}}{col 49}DF:     min{col 67}= {res}    166.62
+{txt}{col 49}        avg{col 67}= {res}  1,219.95
+{txt}{col 49}        max{col 67}= {res}  8,938.81
+{txt}Model F test:{ralign 16: {res:Equal FMI}}{col 49}F({res}  33{txt},{res}19351.5{txt}){col 67}= {res}     69.89
+{txt}{col 49}Prob > F{col 67}= {res}    0.0000
+
+{txt}{hline 24}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}                 spdcb1{col 25}{c |}      Coef.{col 37}   Std. Err.{col 49}      t{col 57}   P>|t|{col 65}     [95% Con{col 78}f. Interval]
+{hline 24}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 18}visit {c |}
+{space 21}6  {c |}{col 25}{res}{space 2}-.3780693{col 37}{space 2} .0525633{col 48}{space 1}   -7.19{col 57}{space 3}0.000{col 65}{space 4}-.4811055{col 78}{space 3}-.2750331
+{txt}{space 20}52  {c |}{col 25}{res}{space 2}-.3709763{col 37}{space 2} .0569497{col 48}{space 1}   -6.51{col 57}{space 3}0.000{col 65}{space 4}-.4826849{col 78}{space 3}-.2592676
+{txt}{space 19}104  {c |}{col 25}{res}{space 2}-.4079763{col 37}{space 2} .0549936{col 48}{space 1}   -7.42{col 57}{space 3}0.000{col 65}{space 4}-.5158067{col 78}{space 3}-.3001459
+{txt}{space 19}156  {c |}{col 25}{res}{space 2}-.4400132{col 37}{space 2} .0592318{col 48}{space 1}   -7.43{col 57}{space 3}0.000{col 65}{space 4} -.556269{col 78}{space 3}-.3237574
+{txt}{space 19}260  {c |}{col 25}{res}{space 2}-.3673328{col 37}{space 2} .0578737{col 48}{space 1}   -6.35{col 57}{space 3}0.000{col 65}{space 4}-.4808662{col 78}{space 3}-.2537994
+{txt}{space 19}520  {c |}{col 25}{res}{space 2}-.2266142{col 37}{space 2} .0662733{col 48}{space 1}   -3.42{col 57}{space 3}0.001{col 65}{space 4}-.3569036{col 78}{space 3}-.0963248
+{txt}{space 23} {c |}
+{space 17}intgrp {c |}{col 25}{res}{space 2}-.0267837{col 37}{space 2} .0260617{col 48}{space 1}   -1.03{col 57}{space 3}0.305{col 65}{space 4}-.0780305{col 78}{space 3} .0244631
+{txt}{space 13}depression {c |}{col 25}{res}{space 2} .2454762{col 37}{space 2} .1158797{col 48}{space 1}    2.12{col 57}{space 3}0.036{col 65}{space 4} .0166945{col 78}{space 3}  .474258
+{txt}{space 14}c_baseage {c |}{col 25}{res}{space 2} .0823417{col 37}{space 2} .0032677{col 48}{space 1}   25.20{col 57}{space 3}0.000{col 65}{space 4} .0759333{col 78}{space 3} .0887501
+{txt}{space 14}c_yrseduc {c |}{col 25}{res}{space 2}-.0260066{col 37}{space 2} .0070604{col 48}{space 1}   -3.68{col 57}{space 3}0.000{col 65}{space 4}-.0399239{col 78}{space 3}-.0120892
+{txt}{space 13}c_basemmse {c |}{col 25}{res}{space 2}-.0915581{col 37}{space 2} .0100493{col 48}{space 1}   -9.11{col 57}{space 3}0.000{col 65}{space 4}-.1112676{col 78}{space 3}-.0718485
+{txt}{space 17}female {c |}{col 25}{res}{space 2} .0124997{col 37}{space 2} .0431395{col 48}{space 1}    0.29{col 57}{space 3}0.772{col 65}{space 4}-.0720829{col 78}{space 3} .0970824
+{txt}{space 23} {c |}
+{space 19}Race {c |}
+{space 17}Black  {c |}{col 25}{res}{space 2} .2470577{col 37}{space 2} .0432939{col 48}{space 1}    5.71{col 57}{space 3}0.000{col 65}{space 4} .1621769{col 78}{space 3} .3319384
+{txt}{space 17}Other  {c |}{col 25}{res}{space 2} .1486716{col 37}{space 2} .1402017{col 48}{space 1}    1.06{col 57}{space 3}0.289{col 65}{space 4}-.1262432{col 78}{space 3} .4235864
+{txt}{space 23} {c |}
+visit#intgrp#depression {c |}
+{space 15}  0 1 1  {c |}{col 25}{res}{space 2}-.1859309{col 37}{space 2} .1432229{col 48}{space 1}   -1.30{col 57}{space 3}0.195{col 65}{space 4}-.4677196{col 78}{space 3} .0958577
+{txt}{space 15}  0 4 0  {c |}{col 25}{res}{space 2} .1514226{col 37}{space 2}  .088127{col 48}{space 1}    1.72{col 57}{space 3}0.086{col 65}{space 4}-.0216396{col 78}{space 3} .3244848
+{txt}{space 15}  0 4 1  {c |}{col 25}{res}{space 2}-.1282159{col 37}{space 2} .1304705{col 48}{space 1}   -0.98{col 57}{space 3}0.326{col 65}{space 4}-.3845721{col 78}{space 3} .1281403
+{txt}{space 15}  6 1 1  {c |}{col 25}{res}{space 2}-.1339311{col 37}{space 2} .1457298{col 48}{space 1}   -0.92{col 57}{space 3}0.359{col 65}{space 4}-.4207515{col 78}{space 3} .1528893
+{txt}{space 15}  6 4 0  {c |}{col 25}{res}{space 2}-1.034939{col 37}{space 2} .0898095{col 48}{space 1}  -11.52{col 57}{space 3}0.000{col 65}{space 4}-1.211365{col 78}{space 3}-.8585126
+{txt}{space 15}  6 4 1  {c |}{col 25}{res}{space 2}-1.177032{col 37}{space 2} .1321502{col 48}{space 1}   -8.91{col 57}{space 3}0.000{col 65}{space 4}-1.436751{col 78}{space 3} -.917313
+{txt}{space 15} 52 1 1  {c |}{col 25}{res}{space 2}-.1333703{col 37}{space 2} .1455604{col 48}{space 1}   -0.92{col 57}{space 3}0.360{col 65}{space 4}-.4198962{col 78}{space 3} .1531555
+{txt}{space 15} 52 4 0  {c |}{col 25}{res}{space 2}-.7588434{col 37}{space 2} .0911548{col 48}{space 1}   -8.32{col 57}{space 3}0.000{col 65}{space 4} -.937959{col 78}{space 3}-.5797278
+{txt}{space 15} 52 4 1  {c |}{col 25}{res}{space 2}-.8426866{col 37}{space 2} .1388328{col 48}{space 1}   -6.07{col 57}{space 3}0.000{col 65}{space 4}-1.115823{col 78}{space 3}-.5695506
+{txt}{space 15}104 1 1  {c |}{col 25}{res}{space 2} -.075968{col 37}{space 2} .1476122{col 48}{space 1}   -0.51{col 57}{space 3}0.607{col 65}{space 4}-.3665944{col 78}{space 3} .2146584
+{txt}{space 15}104 4 0  {c |}{col 25}{res}{space 2}-.4722879{col 37}{space 2} .0910243{col 48}{space 1}   -5.19{col 57}{space 3}0.000{col 65}{space 4}-.6511422{col 78}{space 3}-.2934335
+{txt}{space 15}104 4 1  {c |}{col 25}{res}{space 2} -.468869{col 37}{space 2} .1368782{col 48}{space 1}   -3.43{col 57}{space 3}0.001{col 65}{space 4}-.7381057{col 78}{space 3}-.1996324
+{txt}{space 15}156 1 1  {c |}{col 25}{res}{space 2}-.0479774{col 37}{space 2}  .157057{col 48}{space 1}   -0.31{col 57}{space 3}0.760{col 65}{space 4}-.3575796{col 78}{space 3} .2616248
+{txt}{space 15}156 4 0  {c |}{col 25}{res}{space 2}-.4846215{col 37}{space 2} .0915272{col 48}{space 1}   -5.29{col 57}{space 3}0.000{col 65}{space 4}-.6644918{col 78}{space 3}-.3047512
+{txt}{space 15}156 4 1  {c |}{col 25}{res}{space 2}-.4058438{col 37}{space 2} .1426951{col 48}{space 1}   -2.84{col 57}{space 3}0.005{col 65}{space 4}-.6867106{col 78}{space 3} -.124977
+{txt}{space 15}260 1 1  {c |}{col 25}{res}{space 2}-.0297069{col 37}{space 2} .1491218{col 48}{space 1}   -0.20{col 57}{space 3}0.842{col 65}{space 4}  -.32347{col 78}{space 3} .2640561
+{txt}{space 15}260 4 0  {c |}{col 25}{res}{space 2} -.280596{col 37}{space 2} .0998978{col 48}{space 1}   -2.81{col 57}{space 3}0.005{col 65}{space 4}-.4772258{col 78}{space 3}-.0839662
+{txt}{space 15}260 4 1  {c |}{col 25}{res}{space 2}-.3095455{col 37}{space 2} .1323157{col 48}{space 1}   -2.34{col 57}{space 3}0.020{col 65}{space 4}-.5696767{col 78}{space 3}-.0494144
+{txt}{space 15}520 1 1  {c |}{col 25}{res}{space 2} .0084491{col 37}{space 2} .1575812{col 48}{space 1}    0.05{col 57}{space 3}0.957{col 65}{space 4}-.3024279{col 78}{space 3} .3193261
+{txt}{space 15}520 4 0  {c |}{col 25}{res}{space 2}        0{col 37}{txt}  (omitted)
+{space 15}520 4 1  {c |}{col 25}{res}{space 2}        0{col 37}{txt}  (omitted)
+{space 23} {c |}
+{space 18}_cons {c |}{col 25}{res}{space 2}-.3019312{col 37}{space 2} .0617115{col 48}{space 1}   -4.89{col 57}{space 3}0.000{col 65}{space 4}-.4229153{col 78}{space 3}-.1809471
+{txt}{hline 24}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+
+{hline 29}{c TT}{hline 48}
+{col 3}Random-effects Parameters{col 30}{c |}{col 34}Estimate{col 45}Std. Err.{col 59}[95% Conf. Interval]
+{hline 29}{c +}{hline 48}
+{res}id{txt}: Identity{col 30}{c |}
+{col 20}sd(_cons){col 30}{c |}{res}{col 33} .5557323{col 44} .0153583{col 58} .5264122{col 70} .5866856
+{txt}{hline 29}{c +}{hline 48}
+{col 17}sd(Residual){col 30}{c |}{res}{col 33} .8240273{col 44} .0093019{col 58} .8058917{col 70}  .842571
+{txt}{hline 29}{c BT}{hline 48}
+
+Transformations{col 49}Average RVI{col 67}= {res}    0.8367
+{txt}{col 49}Largest FMI{col 67}= {res}    0.5619
+{txt}DF adjustment:{ralign 15: {res:Large sample}}{col 49}DF:     min{col 67}= {res}    189.96
+{txt}{col 49}        avg{col 67}= {res}    274.96
+{txt}{col 49}        max{col 67}= {res}    342.82
+
+       {txt}condep: {res:_b[depression] + _b[0.visit#1.depression#1.intgrp] + _b[6.visit#1.depression#1.intgrp] + _b[52.visit#1.depression#1.intgrp] + _b[104.visit#1.depression#1.intgrp] + _b[156.visit#1.depression#1.intgrp] + _b[260.visit#1.depression#1.intgrp] + _b[520.visit#1.depression#1.intgrp]}
+     intnodep: {res:_b[intgrp] + _b[0.visit#0.depression#4.intgrp] + _b[6.visit#0.depression#4.intgrp] + _b[52.visit#0.depression#4.intgrp] + _b[104.visit#0.depression#4.intgrp] + _b[156.visit#0.depression#4.intgrp] + _b[260.visit#0.depression#4.intgrp] + _b[520.visit#0.depression#4.intgrp]}
+       intdep: {res:_b[depression] + _b[intgrp] + _b[0.visit#1.depression#4.intgrp] + _b[6.visit#1.depression#4.intgrp] + _b[52.visit#1.depression#4.intgrp] + _b[104.visit#1.depression#4.intgrp] + _b[156.visit#1.depression#4.intgrp] + _b[260.visit#1.depression#4.intgrp] + _b[520.visit#1.depression#4.intgrp]}
+
+{res}{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}      spdcb1{col 14}{c |}      Coef.{col 26}   Std. Err.{col 38}      t{col 46}   P>|t|{col 54}     [95% Con{col 67}f. Interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 6}condep {c |}{col 14}{res}{space 2}-.3529594{col 26}{space 2}  .745316{col 37}{space 1}   -0.47{col 46}{space 3}0.636{col 54}{space 4}-1.823118{col 67}{space 3} 1.117199
+{txt}{space 4}intnodep {c |}{col 14}{res}{space 2}-2.906649{col 26}{space 2} .4244671{col 37}{space 1}   -6.85{col 46}{space 3}0.000{col 54}{space 4}-3.741537{col 67}{space 3}-2.071761
+{txt}{space 6}intdep {c |}{col 14}{res}{space 2}  -3.1135{col 26}{space 2} .5677772{col 37}{space 1}   -5.48{col 46}{space 3}0.000{col 54}{space 4}-4.230953{col 67}{space 3}-1.996047
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}{txt}
+{com}. 
+. //quietly disp "SPEED SCORE DIFFERENCE NON-DEPRESSION FOR INTERVENTION VS TRAINING GROUP"
+. //mi estimate (intgrp: _b[intgrp] + _b[0.visit#4.intgrp] + _b[6.visit#4.intgrp] + _b[52.visit#4.intgrp] + _b[104.visit#4.intgrp] + _b[156.visit#4.intgrp] + _b[260.visit#4.intgrp] + _b[520.visit#4.intgrp]): mixed spdcb1 i.visit intgrp c_baseage c_yrseduc c_basemmse female i.Race i.visit#intgrp || id: if intgrp==4 | intgrp==1 & depression==0 
+. //quietly disp "SPEED SCORE DIFFERENCE DEPRESSION FOR INTERVENTION VS TRAINING GROUP"
+. //mi estimate (intgrp: _b[intgrp] + _b[0.visit#4.intgrp] + _b[6.visit#4.intgrp] + _b[52.visit#4.intgrp] + _b[104.visit#4.intgrp] + _b[156.visit#4.intgrp] + _b[260.visit#4.intgrp] + _b[520.visit#4.intgrp]): mixed spdcb1 i.visit intgrp c_baseage c_yrseduc c_basemmse female i.Race i.visit#intgrp || id: if intgrp==4 | intgrp==1 & depression==1
+. // These models do not run because the sample is different across imputations (in other words, some people are depressed at one time in one imputation but not in others).  Think about alternative ways to do this.
+. 
+. log close
+      {txt}name:  {res}<unnamed>
+       {txt}log:  {res}C:\Users\Joshua\Documents\Emily_Temp_Documents\ACTIVE\01. Depression_Trajectory_Manuscript\Output - Log Files\MI_Results_030820.smcl
+  {txt}log type:  {res}smcl
+ {txt}closed on:  {res} 8 Mar 2020, 23:06:17
+{txt}{.-}
+{smcl}
+{txt}{sf}{ul off}
